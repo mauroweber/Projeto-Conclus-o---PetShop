@@ -10,12 +10,8 @@ export const isLogged = () => {
 
 //função para logar no sistema
 
-export const doLogin = (token, remenberPassword = false) => {
-  if (remenberPassword) {
-    Cookies.set("token", token, { expires: 999 }); //Define o tempo para expirar o login ex: 999 dias
-  } else {
-    Cookies.set("token", token); //Não armazena o login se não marcar
-  }
+export const b = (token) => {
+     Cookies.set("token", token); //Não armazena o login se não marcar
 };
 
 //função para deslogar do sistema
