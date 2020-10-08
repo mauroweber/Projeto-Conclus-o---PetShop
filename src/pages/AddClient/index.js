@@ -1,9 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import { PageArea } from "./styled";
+import CepApi from '../../helpers/CepApi'
 
 import { PageContainer } from "../../components/MainComponets";
 
+CepApi.get('58035192/json').then(res => {
+  console.log(res.data)
+})
+.catch(error => {
+  console.log(error)
+})
+
+const cepHandler = (e) => { // função para preencher o CEP automatico
+  
+}
+
+
+
 const Page = () => {
+
+  const [ userName, setUserName] = useState('');
+  const [ dateBorn, setDateBorn ] = useState('');
+  const [ male, setMale ] = useState('');
+  const [ female, setFemale ] = useState('');
+  const [ phone, setPhone ] = useState('')
+  const [ celPhone, setCelPhone ] = useState('')
+  const [ rg, setRg ] = useState('')
+  const [ cpf, setCpf ] = useState('')
+  const [ email, setEmail ] = useState('')
+
   return (
     <PageContainer>
       <PageArea>
@@ -14,24 +39,24 @@ const Page = () => {
           <div className="Container">
             <div className="personalArea">
               <label>Nome Completo:</label>
-              <input type="text" required></input>
+              <input type="text" required value={userName} onChange={(e)=> setUserName(e.target.value)}></input>
               <label>Data de Nascimento:</label>
-              <input type="date" required></input>
+              <input type="date" required value={dateBorn}></input>
               <label>Sexo:</label>
               <select className="gender" id="gender">
                 <option value="male">Masculino</option>
                 <option value="female">Feminino</option>
               </select>
               <label>Telefone:</label>
-              <input type="tel"></input>
+              <input type="tel" value={phone}></input>
               <label>Celular:</label>
-              <input type="tel" required></input>
+              <input type="tel" value={celPhone} required></input>
               <label>RG:</label>
-              <input type="text" required></input>
+              <input type="text" value={rg} required></input>
               <label>CPF:</label>
-              <input type="text" required></input>
+              <input type="text" value={cpf} required></input>
               <label>E-mail:</label>
-              <input type="email" required></input>
+              <input type="email" value={email} required></input>
             </div>
           </div>
           <p>Endereço</p>
@@ -39,15 +64,15 @@ const Page = () => {
           <hr />
           <div className="area">
             <label>Endereço:</label>
-            <input type="text" required></input>
+            <label>CEP:</label>
+            <input type="text" onChange={cepHandler} required></input>
+            <input type="text" id="logra" required></input>
             <label>Número:</label>
             <input type="number" required></input>
             <label>Cidade:</label>
             <input type="text" required></input>
             <label>Estado:</label>
             <input type="text" required></input>
-            <label>CEP:</label>
-            <input type="search" required></input>
             <label>Complemento:</label>
             <input type="text" required></input>
           </div>
