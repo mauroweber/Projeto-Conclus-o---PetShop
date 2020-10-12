@@ -4,7 +4,7 @@ import CepApi from '../../helpers/CepApi'
 
 import { PageContainer } from "../../components/MainComponets";
 
-const Address = CepApi.get('58035192/json').then(res => {
+CepApi.get('58035192/json').then(res => {
   console.log(res.data)
 })
 .catch(error => {
@@ -14,6 +14,8 @@ const Address = CepApi.get('58035192/json').then(res => {
 const cepHandler = (e) => { // função para preencher o CEP automatico
   
 }
+
+
 
 const Page = () => {
 
@@ -62,6 +64,8 @@ const Page = () => {
           <hr />
           <div className="area">
             <label>Endereço:</label>
+            <label>CEP:</label>
+            <input type="text" onChange={cepHandler} required></input>
             <input type="text" id="logra" required></input>
             <label>Número:</label>
             <input type="number" required></input>
@@ -69,8 +73,6 @@ const Page = () => {
             <input type="text" required></input>
             <label>Estado:</label>
             <input type="text" required></input>
-            <label>CEP:</label>
-            <input type="search" onChange={cepHandler} required></input>
             <label>Complemento:</label>
             <input type="text" required></input>
           </div>
