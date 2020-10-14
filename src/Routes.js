@@ -7,6 +7,7 @@ import SignUp from "./pages/SignUp";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import AddClient from "./pages/AddClient";
+import Order from "./pages/Order";
 
 export default () => {
   return (
@@ -25,6 +26,9 @@ export default () => {
       </Route>
       <Route exact path="/addclient">
         <AddClient />
+      </Route>
+      <Route exact path="/order">
+        <Order />
       </Route>
       <Route>
         <NotFound />

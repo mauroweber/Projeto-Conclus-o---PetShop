@@ -15,19 +15,27 @@ const cepHandler = (e) => { // função para preencher o CEP automatico
   
 }
 
-
-
 const Page = () => {
 
   const [ userName, setUserName] = useState('');
   const [ dateBorn, setDateBorn ] = useState('');
   const [ male, setMale ] = useState('');
   const [ female, setFemale ] = useState('');
-  const [ phone, setPhone ] = useState('')
-  const [ celPhone, setCelPhone ] = useState('')
-  const [ rg, setRg ] = useState('')
-  const [ cpf, setCpf ] = useState('')
-  const [ email, setEmail ] = useState('')
+  const [ phone, setPhone ] = useState('');
+  const [ celPhone, setCelPhone ] = useState('');
+  const [ rg, setRg ] = useState('');
+  const [ cpf, setCpf ] = useState('');
+  const [ email, setEmail ] = useState('');
+  const [ cep, setCep ] = useState('');
+  const [ number, setNumber ] = useState('')
+  const [ logradouro, setLogradouro ] = useState('');
+  const [ localidade, setLocalidade ] = useState('');
+  const [ uf, setUf ] = useState('');
+  const [ complemento, setComplemento ] = useState('');
+  const [ petName, setPetName ] = useState('');
+  const [ petBreed, setPetBreed ] = useState('');
+  const [ petAge, setPetAge ] = useState('');
+  const [ petObservation, setPetObservation ] = useState('');
 
   return (
     <PageContainer>
@@ -44,8 +52,8 @@ const Page = () => {
               <input type="date" required value={dateBorn}></input>
               <label>Sexo:</label>
               <select className="gender" id="gender">
-                <option value="male">Masculino</option>
-                <option value="female">Feminino</option>
+                <option value={male}>Masculino</option>
+                <option value={female}>Feminino</option>
               </select>
               <label>Telefone:</label>
               <input type="tel" value={phone}></input>
@@ -65,29 +73,29 @@ const Page = () => {
           <div className="area">
             <label>Endereço:</label>
             <label>CEP:</label>
-            <input type="text" onChange={cepHandler} required></input>
-            <input type="text" id="logra" required></input>
+            <input type="text" value={cep} onChange={cepHandler} required></input>
+            <input type="text" value={logradouro} required></input>
             <label>Número:</label>
-            <input type="number" required></input>
+            <input type="number" value={number} required></input>
             <label>Cidade:</label>
-            <input type="text" required></input>
+            <input type="text" value={localidade} required></input>
             <label>Estado:</label>
-            <input type="text" required></input>
+            <input type="text" value={uf} required></input>
             <label>Complemento:</label>
-            <input type="text" required></input>
+            <input type="text" value={complemento} required></input>
           </div>
           <p>Dados do Pet</p>
           {/* Area de informações do pet do cliente*/}
           <hr />
           <div className="area">
             <label>Nome do Animal:</label>
-            <input type="text" required></input>
+            <input type="text" value={petName} required></input>
             <label>Raça:</label>
-            <input type="text" required></input>
+            <input type="text" value={petBreed} required></input>
             <label>Idade:</label>
-            <input type="text" required></input>
+            <input type="text" value={petAge} required></input>
             <label>Observação:</label>
-            <input type="text"></input>
+            <input type="text" value={petObservation}></input>
           </div>
           {/*Botão para cadastro do cliente*/}
           <div className="btnAdd">
