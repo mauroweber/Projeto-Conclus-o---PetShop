@@ -3,8 +3,7 @@ import styled from 'styled-components'
 export const PageArea = styled.div`
   
 
-  form { 
-    
+      
     .order {
       background-color: greenyellow;
       justify-content: center;
@@ -16,5 +15,19 @@ export const PageArea = styled.div`
       }
       
     }
-  }
+
+    .orde-table-area {
+      display:flex;
+      align-items: center;
+
+      thead {
+        background-color: black;
+        color: white;
+      }
+
+      tbody td input {
+        width: 50px;
+      }
+    }
+  
 `;
