@@ -2,32 +2,19 @@ import styled from 'styled-components'
 
 export const PageArea = styled.div`
   
-
-      
-    .order {
-      background-color: greenyellow;
-      justify-content: center;
-      font-size: 18px;
-      display: flex;
-
-      .order--area {
-        width: 33%;
-      }
-      
-    }
-
-    .orde-table-area {
-      display:flex;
-      align-items: center;
-
-      thead {
-        background-color: black;
-        color: white;
-      }
-
-      tbody td input {
-        width: 50px;
-      }
-    }
+  .nOrder {
+    background-color: grey;
+    width: 70px;
+  }
   
+  .order-table-area {
+    display: flex;
+    max-width: 1000px;
+    background-color: #00ff00;
+    thead td {
+      
+      color: #fff;
+      background-color: #000;
+    }
+  }
 `;

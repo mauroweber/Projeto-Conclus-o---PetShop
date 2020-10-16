@@ -8,6 +8,7 @@ function Page() {
 
   const [ client, setClient ] = useState('');
   const [ prodID, setProdId ] = useState('');
+  const [ cpf, setCpf ] = useState('');
 
   return(
    <div>
@@ -19,7 +20,7 @@ function Page() {
               <div className="order"> 
                 <div className="order--area"> 
                   <label>Número do Pedido:</label>
-                  <label className="nOrder"></label>
+                  <label className="nOrder">.</label>
                 </div>
                 <div className="order--area">
                   <label>Data: </label>
@@ -32,7 +33,10 @@ function Page() {
               </div>
                 <div className="client">
                   <label>CPF:</label>
+                  <input value={cpf}></input>
+                  <label>Nome: </label>
                   <label>{client}</label>
+                  
                 </div>
                 <div className="order-table-area">
                   <table>

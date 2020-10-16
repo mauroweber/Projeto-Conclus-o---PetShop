@@ -8,6 +8,7 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import AddClient from "./pages/AddClient";
 import Order from "./pages/Order";
+import AddProduct from "./pages/AddProduct"
 
 export default () => {
   return (
@@ -26,6 +27,9 @@ export default () => {
       </Route>
       <Route exact path="/addclient">
         <AddClient />
+      </Route>
+      <Route exac path="/addproduct">
+        <AddProduct />
       </Route>
       <Route exact path="/order">
         <Order />
