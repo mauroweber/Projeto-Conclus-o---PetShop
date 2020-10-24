@@ -15,7 +15,6 @@ function App() {
       <Template>
         <Header />
         <Routes />
-        <Footer />
       </Template>
     </BrowserRouter>
   );

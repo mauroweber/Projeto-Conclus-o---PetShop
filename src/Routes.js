@@ -8,7 +8,8 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import AddClient from "./pages/AddClient";
 import Order from "./pages/Order";
-import AddProduct from "./pages/AddProduct"
+import AddProduct from "./pages/AddProduct";
+import ListPetshop from "./pages/ListPetshop";
 
 export default () => {
   return (
@@ -24,6 +25,9 @@ export default () => {
       </Route>
       <Route exact path="/signup">
         <SignUp />
+      </Route>
+      <Route exact path="/listpetshop">
+        <ListPetshop />
       </Route>
       <Route exact path="/addclient">
         <AddClient />
