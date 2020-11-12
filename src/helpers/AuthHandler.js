@@ -3,9 +3,9 @@ import Cookies from "js-cookie";
 
 //função para ver se está logado
 export const isLogged = () => {
-  let token = Cookies.get("token");
+  let token = localStorage.getItem("@PetsCare:token");
 
-  return token ? true : false;
+  return (token) ? true : false;
 };
 
 //função para logar no sistema
