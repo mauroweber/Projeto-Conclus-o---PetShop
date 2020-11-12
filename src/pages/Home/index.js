@@ -4,6 +4,7 @@ const Page = () => {
   return (
     <div>
       <h1>Pagina Incial</h1>
+  
     </div>
   );
 };
