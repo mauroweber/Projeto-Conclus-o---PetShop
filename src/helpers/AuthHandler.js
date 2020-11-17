@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 //função para ver se está logado
 export const isLogged = () => {
   let token = localStorage.getItem("@PetsCare:token");
-
+  console.log(token);
   return (token) ? true : false;
 };
 
@@ -17,5 +17,5 @@ export const b = (token) => {
 //função para deslogar do sistema
 
 export const doLogout = () => {
-  Cookies.remove("token");
+  localStorage.removeItem("@PetsCare:token");
 };

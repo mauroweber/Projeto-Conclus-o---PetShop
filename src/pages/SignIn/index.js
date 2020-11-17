@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export default function SignIn() {
+const SignIn = () => {
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [key_password, setKey_password] = useState('');
@@ -57,7 +57,9 @@ export default function SignIn() {
       .then((response) => {
         const {token, user} = response.data;
         localStorage.setItem('@PetsCare:token', token);
-      })
+      }).catch(error => {
+        console.error(error);
+      });
 
   }
   return (
@@ -115,12 +117,12 @@ export default function SignIn() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
+              <Link to="/" variant="body2">
                 Esqueceu a Senha?
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link to="/" variant="body2">
                 {"Você não tem uma conta? Cadastrar-se"}
               </Link>
             </Grid>
@@ -134,3 +136,4 @@ export default function SignIn() {
     </Container>
   );
 }
+export default SignIn;

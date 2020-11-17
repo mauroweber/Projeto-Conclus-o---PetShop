@@ -4,12 +4,12 @@ import CepApi from '../../helpers/CepApi'
 
 import { PageContainer } from "../../components/MainComponets";
 
-CepApi.get('58035192/json').then(res => {
-  console.log(res.data)
-})
-.catch(error => {
-  console.log(error)
-})
+// CepApi.get('58035192/json').then(res => {
+//   console.log(res.data)
+// })
+// .catch(error => {
+//   console.log(error)
+// })
 
 const cepHandler = (e) => { // função para preencher o CEP automatico
   
