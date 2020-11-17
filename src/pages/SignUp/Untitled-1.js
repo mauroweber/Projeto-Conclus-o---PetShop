@@ -1,17 +1,26 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import React, { useState, setState } from "react";
 import axios from 'axios'
 import { PageArea } from "./styled";
+import PropTypes from "prop-types";
 
 import { PageContainer } from "../../components/MainComponets";
 
-function Page() {
+export default function Page({
+  user,
+  email,
+  key_password,
+  phone
+}) {
 
-  const [user, setEditableUser] = useState('');
-  const [email, setEditableEmail] = useState('');
-  const [key_password, setEditablePassword] = useState('');
-  const [phone, setEditablePhone] = useState('');
-  
+  const [editableUser, setEditableUser] = useState(user);
+  const [editableEmail, setEditableEmail] = userState(email);
+  const [editablePassword, setEditablePassword] = userState(key_password);
+  const [editablePhone, setEditablePhone] = userState(phone);
+
+  const changeHandler = (e) => {
+    setState({ [e.target.name]: e.target.value })
+  }
+
   const submitHandler = (e) => {
     e.preventDefault()
 
@@ -72,14 +81,10 @@ function Page() {
   );
 }
 
-export default Page;
-
-Page.propTypes = {
+Page.prototype = {
   user: PropTypes.string.isRequired,
   email: PropTypes.string.isRequired,
   key_password: PropTypes.string,
   phone: PropTypes.string.isRequired
-};
-
-
+}
 
