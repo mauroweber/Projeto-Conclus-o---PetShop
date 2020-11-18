@@ -3,25 +3,24 @@ import PropTypes from "prop-types";
 import axios from 'axios'
 import { PageArea } from "./styled";
 
+import Input from "../../components/Input"
+import {Form} from "@unform/web"
+
 import { PageContainer } from "../../components/MainComponets";
 
 function Page() {
-
-  const [user, setEditableUser] = useState('');
-  const [email, setEditableEmail] = useState('');
-  const [key_password, setEditablePassword] = useState('');
-  const [phone, setEditablePhone] = useState('');
   
   const submitHandler = (e) => {
     e.preventDefault()
+    console.log(e)
 
-    let parameter = {
+    /*let parameter = {
       name: user,
       email: email,
       phone: phone,
       key_password: key_password
     }
-    axios.post('http://localhost:8080/user/', parameter)
+  /*  axios.post('http://localhost:8080/user/', parameter)
       .then(response => {
         debugger
         console.log(response)
@@ -29,35 +28,35 @@ function Page() {
       })
       .catch(error => {
         console.log(error)
-      })
+      })*/
   }
 
   return (
     <PageContainer>
       <PageArea>
-        <form onSubmit={submitHandler}>
+        <Form onSubmit={submitHandler}>
           <label className="area">
             <div className="area--title">Nome Completo:</div>
             <div className="area--input">
-              <input type="text" name="user" value={user} onChange={setEditableUser} required />
+              <Input type="text" name="user"/>
             </div>
           </label>
           <label className="area">
             <div className="area--title">E-mail:</div>
             <div className="area--input">
-              <input type="email" name="email" value={email} onChange={(e) => setEditableEmail(e.target.value)} required />
+              <Input type="email" name="email" required />
             </div>
           </label>
           <label className="area">
             <div className="area--title">Telefone:</div>
             <div className="area--input">
-              <input type="phone" name="phone" value={phone} onChange={(e) => setEditablePhone(e.target.value)} required />
+              <Input type="phone" name="phone" required />
             </div>
           </label>
           <label className="area">
             <div className="area--title">Senha:</div>
             <div className="area--input">
-              <input type="password" name="key_password" value={key_password} onChange={(e) => setEditablePassword(e.target.value)} required />
+              <Input type="password" name="key_password" required />
             </div>
           </label>
           <label className="area">
@@ -66,7 +65,7 @@ function Page() {
               <button type="submit">Fazer Cadastro</button>
             </div>
           </label>
-        </form>
+        </Form>
       </PageArea>
     </PageContainer>
   );

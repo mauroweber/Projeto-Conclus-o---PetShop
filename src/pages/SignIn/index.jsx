@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import Api from "../../helpers/Api";
-import { Button, Box, Avatar, Checkbox, CssBaseline, FormControlLabel, Grid, TextField } from "@material-ui/core"
+import { Box, Avatar, Checkbox, CssBaseline, FormControlLabel, Grid} from "@material-ui/core"
+import {Form} from "@unform/web"
+
 import { Link } from 'react-router-dom';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+
 import Container from '@material-ui/core/Container';
+import Input from "../../components/Input/index"
+import Button from "../../components/Button/index"
+import { FiLogIn, FiMail, FiLock } from "react-icons/fi"
 
 function Copyright() {
   return (
@@ -46,16 +52,12 @@ const useStyles = makeStyles((theme) => ({
 
 const SignIn = () => {
   const classes = useStyles();
-  const [email, setEmail] = useState('');
-  const [key_password, setKey_password] = useState('');
 
-  
-  const submitHandler = (e) => {
-    e.preventDefault()
-
-    Api.post("/auth", { email: email, key_password: key_password })
+  const submitHandler = (data) => {
+    console.log(data);
+    Api.post("/auth", { email: data.email, key_password: data.key_password })
       .then((response) => {
-        const {token, user} = response.data;
+        const { token, user } = response.data;
         localStorage.setItem('@PetsCare:token', token);
       }).catch(error => {
         console.error(error);
@@ -74,47 +76,23 @@ const SignIn = () => {
         <Typography component="h1" variant="h5">
           Login
         </Typography>
-        <form className={classes.form} onSubmit={submitHandler} noValidate>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="E-mail"
+        <Form className={classes.form} onSubmit={submitHandler} noValidate>
+          <Input
             name="email"
-            autoComplete="email"
-            autoFocus
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            icon={FiMail}
+            placeholder = "Email"
           />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Senha"
+          <Input
+            name="key_password"
+            icon={FiLock}
             type="password"
-            id="password"
-            autoComplete="current-password"
-            value={key_password}
-            onChange={(e) => setKey_password(e.target.value)}
-
+            placeholder = "Senha"
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Lembrar Senha"
           />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Logar
-          </Button>
+          <Button type="submit">Logar</Button>
           <Grid container>
             <Grid item xs>
               <Link to="/" variant="body2">
@@ -127,7 +105,7 @@ const SignIn = () => {
               </Link>
             </Grid>
           </Grid>
-        </form>
+        </Form>
       </div>
       <Box mt={8}>
         <Copyright />
