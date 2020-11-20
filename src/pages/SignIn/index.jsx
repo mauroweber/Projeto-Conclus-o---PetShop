@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useCallback, useRef } from "react";
 import Api from "../../helpers/Api";
-import { Box, Avatar, Checkbox, CssBaseline, FormControlLabel, Grid} from "@material-ui/core"
-import {Form} from "@unform/web"
+import { Box, Avatar, Checkbox, CssBaseline, FormControlLabel, Grid } from "@material-ui/core"
+import { Form } from "@unform/web";
+import * as Yup from 'yup';
+import getValidationError from "../../utils/getValidationError"
 
 import { Link } from 'react-router-dom';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -9,9 +11,9 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Container from '@material-ui/core/Container';
-import Input from "../../components/Input/index"
-import Button from "../../components/Button/index"
-import { FiLogIn, FiMail, FiLock } from "react-icons/fi"
+import Input from "../../components/Input/index";
+import Button from "../../components/Button/index";
+import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
 
 function Copyright() {
   return (
@@ -52,18 +54,32 @@ const useStyles = makeStyles((theme) => ({
 
 const SignIn = () => {
   const classes = useStyles();
+  const formRef = useRef(null);
 
-  const submitHandler = (data) => {
-    console.log(data);
-    Api.post("/auth", { email: data.email, key_password: data.key_password })
-      .then((response) => {
-        const { token, user } = response.data;
-        localStorage.setItem('@PetsCare:token', token);
-      }).catch(error => {
-        console.error(error);
+  const submitHandler = useCallback(async(data) => {
+    try {
+      formRef.current.setErrors({});
+      const schema = Yup.object().shape({
+        email: Yup.string().email("Digite E-mail valido"),
+        key_password: Yup.string().min(6, "Senha contem no mínimo 6 Dígitos")
       });
 
-  }
+      await schema.validate(data, {
+        abortEarly : false
+      });
+
+      Api.post("/auth", { email: data.email, key_password: data.key_password })
+        .then((response) => {
+          const { token, user } = response.data;
+          localStorage.setItem('@PetsCare:token', token);
+        }).catch(error => {
+          console.error(error);
+        });
+    } catch (erro) {
+      const erros = getValidationError(erro);
+      formRef.current.setErrors(erros);
+    };
+  });
   return (
 
 
@@ -76,17 +92,17 @@ const SignIn = () => {
         <Typography component="h1" variant="h5">
           Login
         </Typography>
-        <Form className={classes.form} onSubmit={submitHandler} noValidate>
+        <Form  ref={formRef} className={classes.form} onSubmit={submitHandler} noValidate>
           <Input
             name="email"
             icon={FiMail}
-            placeholder = "Email"
+            placeholder="Email"
           />
           <Input
             name="key_password"
             icon={FiLock}
             type="password"
-            placeholder = "Senha"
+            placeholder="Senha"
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}

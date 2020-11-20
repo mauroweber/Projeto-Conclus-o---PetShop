@@ -4,9 +4,11 @@ import React, {
   useState,
   useCallback
 } from 'react';
-import { Container } from './styles';
 import PropTypes from 'prop-types';
-import { useField } from "@unform/core"
+import {FiAlertCircle} from 'react-icons/fi'
+import { useField } from "@unform/core";
+import { Container, Error } from './styles';
+import { InsertDriveFile } from '@material-ui/icons';
 
 
 export default function Input({
@@ -40,17 +42,22 @@ export default function Input({
   }, []);
 
   return (
-    <Container>
+    <Container isErrored={!!error} isFilled={isFilled} isFocused={isFocused}>
       { Icon && <Icon size={20} />}
 
       <input
         onFocus={handleInputFocus}
-        onBlur = {handleInputBlur}
+        onBlur={handleInputBlur}
         defaultValue={defaultValue}
         ref={inputRef}
         type={type}
         {...rest}
       />
+      {error && (
+        <Error title={error}>
+          <FiAlertCircle color="#c53030" size={20} />
+        </Error>
+      )}
     </Container>
 
   )
