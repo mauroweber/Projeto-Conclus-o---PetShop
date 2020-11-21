@@ -1,16 +1,15 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { HeaderArea } from "./styled";
 
 import { isLogged, doLogout } from "../../../helpers/AuthHandler";
+import { useAuth } from "../../../helpers/AuthContext";
 
 const Header = () => {
-  let logged = isLogged(); //Verifica se o usuário está logado para habilitar os menus
-
-  const handleLogout = () => {
-    doLogout();
-    window.location.href = "/";
-  };
+  const {signOut, date} = useAuth();
+  const handleLogout =useCallback(async () => {
+    await signOut();
+  }, [signOut]);
 
   return (
     <HeaderArea>
@@ -21,7 +20,7 @@ const Header = () => {
         <div className="Menu">
           <nav>
             <ul>
-              {!logged && (
+              {!date ?(
                 <>
                   <li>
                     <Link to="/signin">Login</Link>
@@ -30,11 +29,10 @@ const Header = () => {
                     <Link to="/signup">Cadastrar</Link>
                   </li>
                 </>
-              )}
-              {logged && (
+              ) : (
                 <>
                   <li>
-                    <Link to="/my-account">Minha Conta</Link>
+                    <Link to="/addClient">Minha Conta</Link>
                   </li>
                   <li>
                     <button onClick={handleLogout}>Sair</button>

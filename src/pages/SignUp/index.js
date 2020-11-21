@@ -12,7 +12,6 @@ function Page() {
   
   const submitHandler = (e) => {
     e.preventDefault()
-    console.log(e)
 
     /*let parameter = {
       name: user,
@@ -74,10 +73,10 @@ function Page() {
 export default Page;
 
 Page.propTypes = {
-  user: PropTypes.string.isRequired,
-  email: PropTypes.string.isRequired,
+  user: PropTypes.string,
+  email: PropTypes.string,
   key_password: PropTypes.string,
-  phone: PropTypes.string.isRequired
+  phone: PropTypes.string
 };
 
 
