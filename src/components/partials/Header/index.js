@@ -2,11 +2,10 @@ import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { HeaderArea } from "./styled";
 
-import { isLogged, doLogout } from "../../../helpers/AuthHandler";
 import { useAuth } from "../../../helpers/AuthContext";
 
 const Header = () => {
-  const {signOut, date} = useAuth();
+  const {signOut, token} = useAuth();
   const handleLogout =useCallback(async () => {
     await signOut();
   }, [signOut]);
@@ -20,7 +19,7 @@ const Header = () => {
         <div className="Menu">
           <nav>
             <ul>
-              {!date ?(
+              {!token ?(
                 <>
                   <li>
                     <Link to="/signin">Login</Link>

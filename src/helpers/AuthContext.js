@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useState } from "react";
 import PropTypes from "prop-types";
-import Api from "./Api";
+import api from "./Api";
 import { useContext } from "react";
 //autetenticação
 
@@ -18,7 +18,7 @@ const AuthProvider = ({ children }) => {
   });
 
   const signIn = useCallback(async ({ email, key_password }) => {
-    await Api.post("/auth", { email: email, key_password: key_password })
+    await api.post("/auth", { email: email, key_password: key_password })
       .then((response) => {
         const { token } = response.data;
         localStorage.setItem('@PetsCare:token', token);
