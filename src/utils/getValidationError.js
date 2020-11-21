@@ -1,5 +1,5 @@
 
-export default function getValidationErrors(err){
+export default function getValidationErrors(err){debugger
   const validationErrors= {};
 
   err.inner.forEach((error) => {

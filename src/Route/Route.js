@@ -2,9 +2,7 @@ import React, { Component } from "react";
 import { Route, Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 
-
-import { isLogged } from "../helpers/AuthHandler";
-
+import { useAuth } from "../helpers/AuthContext";
 
 
 
@@ -13,28 +11,24 @@ export default function RouteWrapper({
   isPrivate = false,
   ...rest
 }) {
-  const isTrue = isLogged();
-    
+  const { token } = useAuth();
+
   return (
     <Route
       {...rest}
-      render={props => (
-         isPrivate === isTrue ? (
-          <>
-          <Component  {...props}/>
-          </>
-
-        ): (
-          <Redirect to={{ pathname: isPrivate ? '/signin' : '/'}} />
-        )
+      render={({location}) => (
+        isPrivate === !!token ? (
+          <Component />
+        ) : (
+            <Redirect to={{ pathname: isPrivate ? '/signin' : '/', state: {from: location} }} />
+          )
       )}
     />
   );
 }
 
 Route.propTypes = {
-  isTrue: PropTypes.bool,
-  component: PropTypes.oneOfType([PropTypes.element, PropTypes.func]).isRequired
+  isToken: PropTypes.string
 }
 
 Route.defaultProps = {
