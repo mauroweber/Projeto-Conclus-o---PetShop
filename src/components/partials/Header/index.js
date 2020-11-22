@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { HeaderArea } from "./styled";
 
-import { useAuth } from "../../../helpers/AuthContext";
+import { useAuth } from "../../../hooks/auth";
 
 const Header = () => {
   const {signOut, token} = useAuth();

@@ -48,7 +48,7 @@ const Page = () => {
         </Form>
       </PageArea>
     </PageContainer>
-  );
+  )
 };
 
 export default Page;
