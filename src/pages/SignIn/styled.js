@@ -1,4 +1,5 @@
-import styled from "styled-components";
+import styled, {keyframes} from "styled-components";
+import { makeStyles } from '@material-ui/core/styles';
 
 export const PageArea = styled.div`
   form {
@@ -22,39 +23,43 @@ export const PageArea = styled.div`
         text-transform: uppercase;
       }
 
-      .area--input {
-        flex: 1;
-
-        input {
-          width: 100%;
-          font-size: 14px;
-          padding: 5px;
-          border: 1px solid #ddd;
-          border-radius: 3px;
-          outline: 0;
-          transition: all ease 0.4s;
-
-          &:focus {
-            border: 1px solid #333;
-            color: #333;
-          }
-        }
-
-        button {
-          background-color: #e67e22;
-          border: 0;
-          outline: 0;
-          padding: 5px 10px;
-          border-radius: 4px;
-          color: #fff;
-          cursor: pointer;
-          text-transform: uppercase;
-
-          &:hover {
-            background-color: #d35400;
-          }
-        }
-      }
     }
   }
 `;
+const appearFromLeft = keyframes`
+  from{
+    opacity: 0;
+    transform: translateY(-500px);
+  }
+
+  to{
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+export const AnimationContainer = styled.div`
+  animation: ${appearFromLeft} 2s;
+`;
+
+export const useStyles = makeStyles((theme) => ({
+  
+
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));

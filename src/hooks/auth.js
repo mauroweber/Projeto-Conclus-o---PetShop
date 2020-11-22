@@ -1,12 +1,13 @@
 import React, { createContext, useCallback, useState } from "react";
-import PropTypes from "prop-types";
-import api from "./Api";
+import api from "../helpers/Api";
 import { useContext } from "react";
+//import {useToast} from "./toast";
 //autetenticação
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
+  //const {addToast} = useToast();
   const [data, setData] = useState(() => {
     const token = localStorage.getItem('@PetsCare:token');
 
@@ -23,8 +24,18 @@ const AuthProvider = ({ children }) => {
         const { token } = response.data;
         localStorage.setItem('@PetsCare:token', token);
         setData({token});
+        // addToast({
+        //   type: 'success',
+        //   title: 'Usuario Logado com Sucesso!',
+        // });
       }).catch(error => {
-        console.error(error);
+
+        
+        // addToast({
+        //   type: 'error',
+        //   title: error.title,
+        //   description: "Descrição"
+        // });
       });
   }, [])
 

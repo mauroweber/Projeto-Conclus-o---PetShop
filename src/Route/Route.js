@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Route, Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 
-import { useAuth } from "../helpers/AuthContext";
+import { useAuth } from "../hooks/auth";
 
 
 
