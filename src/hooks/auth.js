@@ -12,9 +12,9 @@ const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('@PetsCare:token');
 
     if (token) {
+      api.defaults.headers.authorization = `Bearer ${token}`;
       return {token};
     }
-
     return {};
   });
 
@@ -23,7 +23,11 @@ const AuthProvider = ({ children }) => {
       .then((response) => {
         const { token } = response.data;
         localStorage.setItem('@PetsCare:token', token);
+
+        api.defaults.headers.authorization = `Bearer ${token}`;
         setData({token});
+
+
         // addToast({
         //   type: 'success',
         //   title: 'Usuario Logado com Sucesso!',

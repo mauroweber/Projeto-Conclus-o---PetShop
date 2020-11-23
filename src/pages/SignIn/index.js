@@ -117,12 +117,12 @@ const SignIn = () => {
             <Button type="submit">Logar</Button>
             <Grid container>
               <Grid item xs>
-                <Link to="/" variant="body2">
+                <Link to="/signUp" variant="body2">
                   Esqueceu a Senha?
-              </Link>
+                </Link>
               </Grid>
               <Grid item>
-                <Link to="/" variant="body2">
+                <Link to="/signUp" variant="body2">
                   {"Você não tem uma conta? Cadastrar-se"}
                 </Link>
               </Grid>

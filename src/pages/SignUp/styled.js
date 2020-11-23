@@ -1,7 +1,11 @@
 import styled from "styled-components";
 
+
+
 export const PageArea = styled.div`
   form {
+    position: relative;
+    display:1;
     border-radius: 3px;
     padding-top: 20px;
     padding-bottom: 20px;
