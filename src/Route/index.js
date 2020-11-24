@@ -12,11 +12,12 @@ import AddClient from "../pages/AddClient";
 import Order from "../pages/Order";
 import AddProduct from "../pages/AddProduct";
 import ListPetshop from "../pages/ListPetshop";
+import Dashboard from "../pages/DashboardView";
 
 export default () => {
 
   return (
-    <Switch>
+    <Switch >
       <Route exact path="/" component={Home} isPrivate/>
       <Route exact path="/about" component={About} isPrivate/>
       <Route exact path="/signin" component={SignIn} />
@@ -25,6 +26,7 @@ export default () => {
       <Route exact path="/addclient" component={AddClient} isPrivate/>
       <Route exact path="/addproduct" component={AddProduct} isPrivate/>
       <Route exact path="/order" component={Order} isPrivate/>
+      <Route exact path="/dashboard" component={Dashboard}/>
       <Route >
         <NotFound />
       </Route>
