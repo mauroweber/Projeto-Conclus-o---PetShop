@@ -1,22 +1,30 @@
 import styled from "styled-components";
 
 export const HeaderArea = styled.div`
-  height: 60px;
+  height: 80px;
   background-color: #e67e22;
   border-bottom: 1px solid #ccc;
 
-  .container {
-    max-width: 1000px;
-    margin: auto;
-    display: flex;
+`;
+
+export const Container = styled.div`
+  max-width: 100%;
+  margin: auto;
+  display: flex;
+  
+
+
+
+  align-items: stretch;
+
+  img {
+    width: 80px;
+    height: 80px;
+    margin-left: 20px;
+    
   }
 
-  .logo {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    height: 60px;
-  }
+
   a {
     text-decoration: none;
   }
@@ -40,7 +48,6 @@ export const HeaderArea = styled.div`
 
     li {
       margin-left: 20px;
-      margin-rigth: 20px;
       text-transform: uppercase;
 
       a,
@@ -48,7 +55,6 @@ export const HeaderArea = styled.div`
         border: 0;
         background: none;
         color: #fff;
-        font-heigth: blod;
         cursor: pointer;
         outline: 0;
 
