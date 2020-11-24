@@ -8,10 +8,11 @@ export const HeaderArea = styled.div`
 `;
 
 export const Container = styled.div`
-  max-width: 1000px;
+  max-width: 100%;
   margin: auto;
   display: flex;
-  flex:1;
+  
+
 
 
   align-items: stretch;
@@ -20,6 +21,7 @@ export const Container = styled.div`
     width: 80px;
     height: 80px;
     margin-left: 20px;
+    
   }
 
 

@@ -2,6 +2,7 @@ import styled, {keyframes} from "styled-components";
 import { makeStyles } from '@material-ui/core/styles';
 
 export const PageArea = styled.div`
+  height: 100%;
   form {
     border-radius: 3px;
     padding-top: 20px;
@@ -40,6 +41,12 @@ const appearFromLeft = keyframes`
 
 export const AnimationContainer = styled.div`
   animation: ${appearFromLeft} 2s;
+`;
+
+export const AsideCss = styled.div`
+  display: block;
+  flex:1;
+
 `;
 
 export const useStyles = makeStyles((theme) => ({
