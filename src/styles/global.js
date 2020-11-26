@@ -9,8 +9,6 @@ export default createGlobalStyle`
   }
 
   body{
-    color: #FFF;
-    background: #312e38;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -28,14 +26,13 @@ export default createGlobalStyle`
       width: 100%;
   }
 
-
 `;
 
-export const Test = styled.div`
+export const PageBody = styled.div`
 
 display: flex;
 flex-direction: row;
-height: 88vh;
+height: calc(100vh - 145px);
 
 
 `;

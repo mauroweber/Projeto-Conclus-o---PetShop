@@ -1,110 +1,197 @@
-import React, { useState } from "react";
-import { PageArea } from "./styled";
-import CepApi from '../../helpers/CepApi'
+import React, { useCallback } from "react";
+//import CepApi from '../../helpers/CepApi';
+import { Container } from './styled';
+import { Select, MenuItem, TextField, Button } from "@material-ui/core";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import api from "../../helpers/Api";
 
-import { PageContainer } from "../../components/MainComponets";
+import getValidationError from "../../utils/getValidationError";
+import { useToast } from "../../hooks/toast";
 
-// CepApi.get('58035192/json').then(res => {
-//   console.log(res.data)
-// })
-// .catch(error => {
-//   console.log(error)
-// })
+const initialValues = {
+  name: "",
+  email: "",
+  phone: "",
+  street: "",
+  number: "",
+  cpfCnpj: "",
+  complement: ""
 
-const cepHandler = (e) => { // função para preencher o CEP automatico
-  
 }
 
-const Page = () => {
+const schema = Yup.object().shape({
 
-  const [ userName, setUserName] = useState('');
-  const [ dateBorn, setDateBorn ] = useState('');
-  const [ male, setMale ] = useState('');
-  const [ female, setFemale ] = useState('');
-  const [ phone, setPhone ] = useState('');
-  const [ celPhone, setCelPhone ] = useState('');
-  const [ rg, setRg ] = useState('');
-  const [ cpf, setCpf ] = useState('');
-  const [ email, setEmail ] = useState('');
-  const [ cep, setCep ] = useState('');
-  const [ number, setNumber ] = useState('')
-  const [ logradouro, setLogradouro ] = useState('');
-  const [ localidade, setLocalidade ] = useState('');
-  const [ uf, setUf ] = useState('');
-  const [ complemento, setComplemento ] = useState('');
-  const [ petName, setPetName ] = useState('');
-  const [ petBreed, setPetBreed ] = useState('');
-  const [ petAge, setPetAge ] = useState('');
-  const [ petObservation, setPetObservation ] = useState('');
+  name: Yup
+    .string()
+    .required("Nome Obrigratorio"),
+  email: Yup
+    .string()
+    .required("Email requerido ")
+    .email("Digite um Email Válido"),
+  phone: Yup
+    .string()
+    .required("Número para contato reuqerido"),
+  cpfCnpj: Yup
+    .string()
+    .required("Cpf Requerido"),
+
+});
+
+
+const Page = () => {
+  const { addToast } = useToast();
+
+
+  const formik = useFormik({
+    initialValues: initialValues,
+
+    validationSchema: schema,
+
+
+    onSubmit: useCallback(async (values) => {
+      try {
+
+        await schema.validate(values, {
+          abortEarly: false
+        })
+
+        var parameter = {
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          cpfCnpj: values.cpfCnpj
+        }
+        await api.post("/user", parameter)
+          .then(response => {
+            console.log(response);
+            addToast({
+              type: 'success',
+              title: "Erro Autenticação da Pagina",
+              description: "Adicionado com Sucesso"
+            });
+          }).catch(error =>{debugger
+            console.log(error);
+          })
+
+
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          const erros = getValidationError(error);
+          erros.forEach(err => {
+            addToast({
+              type: 'error',
+              title: "Erro Autenticação da Pagina",
+              description: err
+            });
+          });
+          error.erros.map((e) => {
+            addToast({
+              type: 'error',
+              title: "Erro Autenticação da Pagina",
+              description: e
+            });
+          });
+          return;
+        }
+        console.log("aquie" + error);
+
+        addToast({
+          type: 'error',
+          title: "Erro Autenticação da Pagina",
+          description: "Erro inesperado"
+        });
+
+
+      };
+    }, [addToast]),
+
+    onReset: initialValues
+
+  });
 
   return (
-    <PageContainer>
-      <PageArea>
-        <form>
-          <p>Dados Pessoais</p>
-          {/* Area de dados pessoais do cliente*/}
-          <hr />
-          <div className="Container">
-            <div className="personalArea">
-              <label>Nome Completo:</label>
-              <input type="text" required value={userName} onChange={(e)=> setUserName(e.target.value)}></input>
-              <label>Data de Nascimento:</label>
-              <input type="date" required value={dateBorn}></input>
-              <label>Sexo:</label>
-              <select className="gender" id="gender">
-                <option value={male}>Masculino</option>
-                <option value={female}>Feminino</option>
-              </select>
-              <label>Telefone:</label>
-              <input type="tel" value={phone}></input>
-              <label>Celular:</label>
-              <input type="tel" value={celPhone} required></input>
-              <label>RG:</label>
-              <input type="text" value={rg} required></input>
-              <label>CPF:</label>
-              <input type="text" value={cpf} required></input>
-              <label>E-mail:</label>
-              <input type="email" value={email} required></input>
-            </div>
-          </div>
-          <p>Endereço</p>
-          {/* Area de endereço do cliente*/}
-          <hr />
-          <div className="area">
-            <label>Endereço:</label>
-            <label>CEP:</label>
-            <input type="text" value={cep} onChange={cepHandler} required></input>
-            <input type="text" value={logradouro} required></input>
-            <label>Número:</label>
-            <input type="number" value={number} required></input>
-            <label>Cidade:</label>
-            <input type="text" value={localidade} required></input>
-            <label>Estado:</label>
-            <input type="text" value={uf} required></input>
-            <label>Complemento:</label>
-            <input type="text" value={complemento} required></input>
-          </div>
-          <p>Dados do Pet</p>
-          {/* Area de informações do pet do cliente*/}
-          <hr />
-          <div className="area">
-            <label>Nome do Animal:</label>
-            <input type="text" value={petName} required></input>
-            <label>Raça:</label>
-            <input type="text" value={petBreed} required></input>
-            <label>Idade:</label>
-            <input type="text" value={petAge} required></input>
-            <label>Observação:</label>
-            <input type="text" value={petObservation}></input>
-          </div>
-          {/*Botão para cadastro do cliente*/}
-          <div className="btnAdd">
-            <button>Cadastrar Cliente</button>
-          </div>
-        </form>
-      </PageArea>
-    </PageContainer>
+    <Container>
+      <form onReset={formik.handleReset} onSubmit={formik.handleSubmit} noValidate>
+        <h1>Dados Cadastrais </h1>
+        <hr />
+        <TextField
+          fullWidth
+          id="name"
+          name="name"
+          label="Nome"
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          error={formik.touched.name && Boolean(formik.errors.name)}
+          helperText={formik.touched.name && formik.errors.name}
+        />
+
+        <TextField
+          fullWidth
+          id="email"
+          name="email"
+          label="E-mail"
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          error={formik.touched.email && Boolean(formik.errors.email)}
+          helperText={formik.touched.email && formik.errors.email}
+        />
+
+        <TextField
+          fullWidth
+          id="phone"
+          name="phone"
+          label="Telefone Celular"
+          value={formik.values.phone}
+          onChange={formik.handleChange}
+          error={formik.touched.phone && Boolean(formik.errors.phone)}
+          helperText={formik.touched.phone && formik.errors.phone}
+        />
+        <TextField
+          fullWidth
+          id="cpfCnpj"
+          name="cpfCnpj"
+          label="Cpf Cnpj"
+          value={formik.values.cpfCnpj}
+          onChange={formik.handleChange}
+          error={formik.touched.cpfCnpj && Boolean(formik.errors.cpfCnpj)}
+          helperText={formik.touched.cpfCnpj && formik.errors.cpfCnpj}
+        />
+        <TextField
+          fullWidth
+          id="number"
+          name="number"
+          label="Numero"
+          value={formik.values.number}
+          onChange={formik.handleChange}
+        />
+        <TextField
+          fullWidth
+          id="street"
+          name="street"
+          label="Rua"
+          value={formik.values.street}
+          onChange={formik.handleChange}
+        />
+        <TextField
+          fullWidth
+          id="complement"
+          name="complement"
+          label="Complemento"
+          value={formik.values.complement}
+          onChange={formik.handleChange}
+        />
+
+
+        <Button color="secondary" variant="contained" fullWidth type="submit">
+          Cadastrar Cliente
+        </Button>
+
+
+      </form>
+    </Container>
   );
 };
 
 export default Page;
+

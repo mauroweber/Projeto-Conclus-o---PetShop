@@ -5,7 +5,7 @@ import Routes from "./Route";
 import AppProvider from "./hooks";
 import Footer from "./components/partials/Footer";
 import Aside from "./components/partials/Aside";
-import GlobalStyle , {Test} from "./styles/global";
+import GlobalStyle , {PageBody} from "./styles/global";
 
 
 //import "./App.css";
@@ -15,10 +15,10 @@ function App() {
     <BrowserRouter>
       <AppProvider>
         <Header />
-        <Test>
+        <PageBody>
           <Aside />
           <Routes />
-        </Test>
+        </PageBody>
         <Footer />
       </AppProvider>
       <GlobalStyle />
