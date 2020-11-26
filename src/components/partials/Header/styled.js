@@ -20,8 +20,7 @@ export const Container = styled.div`
   img {
     width: 80px;
     height: 80px;
-    margin-left: 20px;
-    
+    margin-left: 20px;    
   }
 
 
@@ -32,6 +31,7 @@ export const Container = styled.div`
   nav {
     padding-top: 10px;
     padding-bottom: 10px;
+    flex-direction: row-reverse;
 
     ul,
     li {

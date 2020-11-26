@@ -1,16 +1,14 @@
 import styled from "styled-components";
 
-export const PageArea = styled.div`
-  .Container {
+export const Container = styled.div`
+
     display: flex;
-    width: 1000px;
+    align-items: center;
+    margin: auto;
+ 
 
-    .personalArea {
-      flex-wrap: wrap;
-    }
-  }
 
-  .area {
+  /* .area3 {
     display: flex;
     flex-wrap: wrap;
     flex: 1;
@@ -18,7 +16,7 @@ export const PageArea = styled.div`
   .btnAdd {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; */
 
     button {
       display: flex;
@@ -37,5 +35,5 @@ export const PageArea = styled.div`
         background-color: #ff4500;
       }
     }
-  }
+
 `;
