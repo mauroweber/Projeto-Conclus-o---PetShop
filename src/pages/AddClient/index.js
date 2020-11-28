@@ -67,8 +67,7 @@ const Page = () => {
             console.log(response);
             addToast({
               type: 'success',
-              title: "Erro Autenticação da Pagina",
-              description: "Adicionado com Sucesso"
+              title: "Usuario cadastrado com Sucesso"
             });
           }).catch(error =>{debugger
             console.log(error);
@@ -94,7 +93,6 @@ const Page = () => {
           });
           return;
         }
-        console.log("aquie" + error);
 
         addToast({
           type: 'error',
