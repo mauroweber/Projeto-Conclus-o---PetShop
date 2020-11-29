@@ -13,6 +13,7 @@ import Order from "../pages/Order";
 import AddProduct from "../pages/AddProduct";
 import ListPetshop from "../pages/ListPetshop";
 import Dashboard from "../pages/DashboardView";
+import Pets from "../pages/Pet";
 
 export default () => {
 
@@ -27,6 +28,7 @@ export default () => {
       <Route exact path="/addproduct" component={AddProduct} isPrivate/>
       <Route exact path="/order" component={Order} isPrivate/>
       <Route exact path="/dashboard" component={Dashboard}/>
+      <Route exact path= "/pets" component={Pets} isPrivate/>
       <Route >
         <NotFound />
       </Route>

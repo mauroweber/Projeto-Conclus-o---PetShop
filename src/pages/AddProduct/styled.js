@@ -1,4 +1,8 @@
+import styled from "styled-components";
 
+
+
+export const Container = styled.div`
 * {
   color: #1d1d1d;
 }
@@ -19,7 +23,7 @@
 .img-pet {
   height: 400px;
   width: 100%;
-
+  
   border: 3px solid rgba(255, 255, 255, 0.3);
   background: #eee;
 }
@@ -33,3 +37,4 @@
   height: 48px;
 }
 
+`;

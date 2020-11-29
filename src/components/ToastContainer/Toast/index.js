@@ -23,7 +23,7 @@ const Toast = ({ message, style }) => {
   }, [removeToast, message.id]);
 
   return (
-    <Container type={message.type} hasDescription={Number(!!message.hasDescription)} style={style}>
+    <Container type={message.type} hasDescription={!!message.hasDescription} style={style}>
       {icons[message.type || 'info']}
       <div>
         <strong>{message.title} </strong>

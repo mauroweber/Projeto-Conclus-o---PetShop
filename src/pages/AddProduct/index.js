@@ -4,7 +4,7 @@ import api from "../../helpers/Api";
 
 import { FaTrashAlt } from "react-icons/fa";
 
-import "./style.css";
+import { Container } from "./styled";
 
 function Product() {
   const [products, setProducts] = useState([]);
@@ -36,37 +36,39 @@ function Product() {
     setSelectedCategory(e.target.value);
   }
 
-  const insertFile =    async (id, file) =>{debugger
-     await api.put("product/insertImg/" + id, file)
-     .then( data =>{
-       setUrlImg(data.data.url);
-     })
- }
+  const insertFile = async (id, file) => {
+    debugger
+    await api.put("product/insertImg/" + id, file)
+      .then(data => {
+        setUrlImg(data.data.url);
+      })
+  }
 
-  async  function handleAddPRoduct (e) {
+  async function handleAddPRoduct(e) {
     e.preventDefault();
 
-      const data = {
-        description,
-        price,
-        name: product,
-        imgUrl: urlImg,
-      };
+    const data = {
+      description,
+      price,
+      name: product,
+      imgUrl: urlImg,
+    };
 
-      console.log(data);
-      const file = new FormData();
-      file.append("img", img);
+    console.log(data);
+    const file = new FormData();
+    file.append("img", img);
 
 
     await api.post("product/insert", data)
-      .then(response =>{debugger
+      .then(response => {
+        debugger
         console.log(response.data);
         const result = response.data;
-        setProducts([...products,result]);
-        if(result.id != null){
+        setProducts([...products, result]);
+        if (result.id != null) {
           insertFile(result.id, file);
         }
-      }).catch(error =>{
+      }).catch(error => {
         console.log(error);
       });
 
@@ -91,125 +93,123 @@ function Product() {
   }, []);
 
   return (
-    <Col>
-      <Col style={{ textAlign: "center", marginTop: 20 }}>
-        <Button className="btn-open-cad" variant="dark" onClick={handleShow}>
-          Cadastrar produto
-        </Button>
-      </Col>
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Adicionar Produto</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form
-            onSubmit={handleAddPRoduct}
-            className="form-container"
-            encType="multipart/form-data"
-          >
-            <Form.Group>
-              <Form.Label>Produto</Form.Label>
-              <Form.Control
-                type="text"
-                name="product"
-                value={product}
-                onChange={(e) => setProduct(e.target.value)}
-                placeholder="Nome do Produto"
-                required
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>URL imagem do Produto</Form.Label>
-              <Form.Control
-                type="text"
-                name="urlImg"
-                value={urlImg}
-                onChange={(e) => setUrlImg(e.target.value)}
-              />
-              <Form.File
-                id="img-upload"
-                label="Escolha a imagem do produto"
-                accept="image/x-png,image/gif,image/jpeg"
-                onChange={(e) => setImg(e.target.files[0])}
-                required
-              />
-            </Form.Group>
-            <Form.Group controlId="id-description">
-              <Form.Label>Descrição</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                name="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group>
-              <Row>
-                <Col>
-                  <Form.Label>Categoria</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={selectedCategory}
-                    onChange={handleSelectedCategory}
-                  >
-                    <option>Escolha uma categoria</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </Form.Control>
-                </Col>
-                <Col>
-                  <Form.Label>Preço</Form.Label>
-                  <Form.Control
-                    type=""
-                    name="price"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="Preço do Produto"
-                    required
-                  ></Form.Control>
-                </Col>
-              </Row>
-            </Form.Group>
-            <Button type="submit" className="btn-product" variant="dark">
-              Cadastrar
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
-      <Row>
-        {products.map((product) => (
-          <Col key={product.id} sm={12} md={6} lg={4} style={{ marginTop: 50 }}>
-            <Card>
-              <Card.Img
-                className="img-pet"
-                variant="top"
-                as={Image}
-                src={product.imgUrl}
-                fluid = {true}
-                alt={product.name}
-              />
-              <Card.Body>
-                <Card.Title>{product.name}</Card.Title>
-                <Card.Text>{product.description}</Card.Text>
-                <p>
-                  Preço: <strong>{product.price}R$</strong>
-                </p>
-                <FaTrashAlt
-                  onClick={(e) => handleDeleteProduct(product.id)}
-                  className="icon-trash"
+    <Container>
+
+
+      <Col>
+        <Col style={{ textAlign: "center", marginTop: 20 }}>
+          <Button className="btn-open-cad" variant="dark" onClick={handleShow}>
+            Cadastrar produto
+        </Button>
+        </Col>
+
+        <Modal show={show} onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Adicionar Produto</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form
+              onSubmit={handleAddPRoduct}
+              className="form-container"
+              encType="multipart/form-data"
+            >
+              <Form.Group >
+                <Form.Label>Produto</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="product"
+                  value={product}
+                  onChange={(e) => setProduct(e.target.value)}
+                  placeholder="Nome do Produto"
+                  required
                 />
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    </Col>
+              </Form.Group>
+              <Form.Group>
+                <Form.File
+                  id="img-upload"
+                  label="Insira a imagem do produto"
+                  accept="image/x-png,image/gif,image/jpeg"
+                  onChange={(e) => setImg(e.target.files[0])}
+                  required
+                />
+              </Form.Group>
+              <Form.Group controlId="id-description">
+                <Form.Label>Descrição</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  name="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                />
+              </Form.Group>
+              <Form.Group>
+                <Row>
+                  <Col>
+                    <Form.Label>Categoria</Form.Label>
+                    <Form.Control
+                      as="select"
+                      value={selectedCategory}
+                      onChange={handleSelectedCategory}
+                    >
+                      <option>Escolha uma categoria</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </Form.Control>
+                  </Col>
+                  <Col>
+                    <Form.Label>Preço</Form.Label>
+                    <Form.Control
+                      type=""
+                      name="price"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="Preço do Produto"
+                      required
+                    ></Form.Control>
+                  </Col>
+                </Row>
+              </Form.Group>
+              <Button type="submit" className="btn-product" variant="dark">
+                Cadastrar
+            </Button>
+            </Form>
+          </Modal.Body>
+        </Modal>
+        <Row>
+          {products.map((product) => (
+            <Col key={product.id} sm={12} md={6} lg={4} style={{ marginTop: 50 }}>
+              <Card>
+                <Card.Img
+                  className="img-pet"
+                  variant="top"
+                  as={Image}
+                  src={product.imgUrl}
+                  fluid={true}
+                  alt={product.name}
+                />
+                <Card.Body>
+                  <Card.Title>{product.name}</Card.Title>
+                  <Card.Text>{product.description}</Card.Text>
+                  <p>
+                    Preço: <strong>{product.price}R$</strong>
+                  </p>
+                  <FaTrashAlt
+                    onClick={(e) => handleDeleteProduct(product.id)}
+                    className="icon-trash"
+                  />
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Col>
+    </Container>
   );
 }
 

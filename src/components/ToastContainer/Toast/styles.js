@@ -64,7 +64,7 @@ export const Container = styled(animated.div)`
 
   }
 
-  ${props => !props.hasDescription && css`
+  ${props => Number(!props.hasDescription) && css`
       align-items: center;
       svg{
         margin-top: 0;
