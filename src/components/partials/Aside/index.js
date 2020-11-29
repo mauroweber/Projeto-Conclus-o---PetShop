@@ -12,7 +12,7 @@ const Aside = () => {
           <ul>
             <li><Link to="/dashboard">Home</Link></li>
             <li><Link to="/addClient">Cadastro Cliente</Link></li>
-            <li><Link to="/dashboard">Cadastro Produto</Link></li>
+            <li><Link to="/addproduct">Cadastro Produto</Link></li>
           </ul>
         </AsideArea>) : (null)}
     </>

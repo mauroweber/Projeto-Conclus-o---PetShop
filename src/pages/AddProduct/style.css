@@ -1,0 +1,35 @@
+
+* {
+  color: #1d1d1d;
+}
+.container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.btn-product {
+  width: 130px;
+  float: right;
+}
+
+.btn-open-cad {
+  background-color: #e67e22;
+}
+
+.img-pet {
+  height: 400px;
+  width: 100%;
+
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  background: #eee;
+}
+
+.icon-trash {
+  color: crimson;
+  float: right;
+}
+
+.icon-trash:hover {
+  height: 48px;
+}
+

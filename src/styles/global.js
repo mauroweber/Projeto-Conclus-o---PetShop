@@ -10,13 +10,17 @@ export default createGlobalStyle`
 
   body{
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   body, input, button{
     font-size: 16px;
   }
 
-
+ html, body, #root{
+   height:100%;
+   width: 100%;
+ }
 
   button{
     cursor: pointer;

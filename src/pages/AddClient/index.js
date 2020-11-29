@@ -64,7 +64,6 @@ const Page = () => {
         }
         await api.post("/user", parameter)
           .then(response => {
-            console.log(response);
             addToast({
               type: 'success',
               title: "Usuario cadastrado com Sucesso"
