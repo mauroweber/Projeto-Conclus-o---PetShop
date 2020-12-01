@@ -1,8 +1,4 @@
-import styled from "styled-components";
 
-
-
-export const Container = styled.div`
 * {
   color: #1d1d1d;
 }
@@ -36,5 +32,3 @@ export const Container = styled.div`
 .icon-trash:hover {
   height: 48px;
 }
-
-`;

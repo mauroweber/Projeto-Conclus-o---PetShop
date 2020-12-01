@@ -4,7 +4,7 @@ import api from "../../helpers/Api";
 
 import { FaTrashAlt } from "react-icons/fa";
 
-import { Container } from "./styled";
+import  "./style.css";
 
 function Product() {
   const [products, setProducts] = useState([]);
@@ -61,7 +61,6 @@ function Product() {
 
     await api.post("product/insert", data)
       .then(response => {
-        debugger
         console.log(response.data);
         const result = response.data;
         setProducts([...products, result]);
@@ -94,7 +93,7 @@ function Product() {
 
   return (
 
-    <Container>
+
 
 
       <Col>
@@ -209,7 +208,7 @@ function Product() {
           ))}
         </Row>
       </Col>
-    </Container>
+
   );
 }
 
