@@ -3,13 +3,16 @@ import styled from "styled-components";
 
 
 export const Container = styled.div`
+    height: 100%;
   form {
     position: absolute;
-    display:1;
     border-radius: 5px;
     padding-top: 20px;
     padding-bottom: 20px;
     box-shadow: 0px 0px 3px #999;
+    margin: 5% 50% 0 0;
+    margin-left : 25%;
+    padding: 130px;
 
     .area {
       display: flex;

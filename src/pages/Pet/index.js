@@ -7,6 +7,7 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
+import Swal from 'sweetalert2';
 
 const cores = [
   { id: 1, cor: "Preto" },
@@ -50,6 +51,7 @@ const Pets = () => {
   const { addToast } = useToast();
 
 
+
   const formik = useFormik({
     initialValues: initialValues,
 
@@ -61,7 +63,7 @@ const Pets = () => {
         await schema.validate(data, {
           abortEarly: false
         })
-        
+
         let parameter = {
           name: data.name,
           doctorName: data.doctorName,
@@ -70,8 +72,14 @@ const Pets = () => {
         }
 
         await Api.post("/pets", parameter)
-          .then(response =>{
-            console.log(response);
+          .then(response => {
+            Swal.fire({
+              position: 'top-end',
+              icon: 'success',
+              title: 'Your work has been saved',
+              showConfirmButton: false,
+              timer: 1500
+            })
           });
 
       } catch (error) {
@@ -95,7 +103,9 @@ const Pets = () => {
         }
       };
 
-    }, [])
+    }, []),
+
+    onReset: { initialValues },
 
   });
 
@@ -105,9 +115,9 @@ const Pets = () => {
 
   return (
     <Container>
-      <h1>laksdlkajsdklas</h1>
+      <h1>Page Pets</h1>
       <button onClick={handleModal}>
-        aqui
+        Cadastrar Pet
     </button>
       <Modal
         show={show}
@@ -120,7 +130,7 @@ const Pets = () => {
         <Modal.Body >
           <Form onReset={formik.resetForm} onSubmit={formik.handleSubmit} noValidate>
             <Form.Row>
-              <Form.Group  as={Col} controlId="name">
+              <Form.Group as={Col} controlId="name">
                 <Form.Label>Nome Pet: </Form.Label>
                 <Form.Control
                   required
@@ -128,7 +138,7 @@ const Pets = () => {
                   value={formik.values.name}
                   onChange={formik.handleChange}
                   // isValid={formik.touched.name && Boolean(formik.errors.name)}
-                  isInvalid= {formik.touched.name && Boolean(formik.errors.name)}  
+                  isInvalid={formik.touched.name && Boolean(formik.errors.name)}
                 />
                 <Form.Control.Feedback type="invalid" tooltip>
                   {formik.errors.name}
@@ -175,20 +185,20 @@ const Pets = () => {
                       name="sex"
                       value="masculino"
                       onChange={formik.handleChange}
-                      isInvalid = {!!formik.errors.sex}
+                      isInvalid={!!formik.errors.sex}
                     />
                     <Form.Check
                       type="radio"
                       label="Feminino"
                       name="sex"
                       value="feminino"
-                      isInvalid = {formik.errors.sex}
+                      isInvalid={formik.errors.sex}
                     />
                   </Col>
                   <Form.Control.Feedback type="invalid" tooltip>
-                  {formik.errors.sex}
-                </Form.Control.Feedback>
-                <Form.Control.Feedback tooltip>Looks good!</Form.Control.Feedback>
+                    {formik.errors.sex}
+                  </Form.Control.Feedback>
+                  <Form.Control.Feedback tooltip>Looks good!</Form.Control.Feedback>
                 </Form.Group>
               </fieldset>
 
@@ -215,9 +225,9 @@ const Pets = () => {
                   isValid={formik.touched.cor && !formik.errors.cor}
                 >
                   <option value="defaul">-- Nenhum --</option>
-                  { cores.map( cor =>{
-                    return(
-                    <option value={cor.id}>{cor.cor}</option>)
+                  {cores.map(cor => {
+                    return (
+                      <option value={cor.id}>{cor.cor}</option>)
                   })
                   }
                 </Form.Control>

@@ -16,13 +16,13 @@ import Container from '@material-ui/core/Container';
 import Input from "../../components/Input/index";
 import Button from "../../components/Button/index";
 import { FiMail, FiLock } from "react-icons/fi";
-import Aside from "../../components/partials/Aside"
+import Swal from "sweetalert2";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" to="https://material-ui.com/">
+      <Link color="inherit" to="https://github.com/mauroweber/Projeto-Conclus-o---PetShop">
         Pet Care
       </Link>{' '}
       {new Date().getFullYear()}
@@ -58,11 +58,16 @@ const SignIn = () => {
       await signIn({
         email: data.email,
         key_password: data.key_password
-      });
-
-      addToast({
-        type: 'success',
-        title: "Usuario Autenticado"
+      }).then(response =>{
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: 'Usuario Autenticado',              
+          showConfirmButton: false,
+          timer: 1500
+        })
+        // setTimeout(() => {            
+        // }, 1500);
       });
 
     } catch (erro) {

@@ -8,6 +8,7 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
+import Swal from 'sweetalert2';
 
 const schema = yup.object().shape({
   name: yup.string().required("Insira o nome do Pet"),
@@ -47,7 +48,16 @@ const Pets = () => {
 
         await Api.post("/user/register", parameter)
           .then(response => {
-            console.log(response);
+            Swal.fire({
+              position: 'center',
+              icon: 'success',
+              title: 'Cadastrado com Sucesso',              
+              showConfirmButton: false,
+              timer: 1500
+            })
+            setTimeout(() => {
+              history.push("/signin");              
+            }, 1500);
           });
 
       } catch (error) {

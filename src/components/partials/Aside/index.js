@@ -14,10 +14,10 @@ const Aside = () => {
               <Link to="/dashboard">Home</Link>
             </li>
             <li>
-              <Link to="/addClient">Cadastro Cliente</Link>
+              <Link to="/addClient">Cliente</Link>
             </li>
             <li>
-              <Link to="/addproduct">Cadastro Produto</Link>
+              <Link to="/addproduct">Produto</Link>
             </li>
             <li>
               <Link to="/pets">Pets </Link>
