@@ -1,64 +1,146 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
-import api from "../../helpers/Api";
-import { PageArea } from "./styled";
-import Yup from "yup";
+import React, { useCallback, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { Typography, Form, Modal, Col, Button, Row } from "react-bootstrap";
+import { TextField } from "@material-ui/core";
+import { Container } from "./styled";
+import Api from "../../helpers/Api";
+import * as yup from "yup";
+import { useFormik } from "formik";
+import getValidationError from "../../utils/getValidationError";
+import { useToast } from "../../hooks/toast";
 
-import Input from "../../components/Input";
-import Button from "../../components/Button";
+const schema = yup.object().shape({
+  name: yup.string().required("Insira o nome do Pet"),
+  email: yup.string().required("E-Mail Obrigatorio").email("Digite email valido"),
+  password: yup.string().required("Digite a senha ").min(6, "A senha deve conter minimo 6 caracteres"),
+  passwordCheck: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),
+});
 
-import { Form } from "@unform/web";
+const initialValues = {
+  name: "",
+  email: "",
+  password: "",
+  passwordCheck: "",
+};
 
-import { PageContainer } from "../../components/MainComponets";
-import { useCallback } from "react";
+const Pets = () => {
+  const { addToast } = useToast();
+  const history = useHistory();
 
-const Page = () => {
+  const formik = useFormik({
+    initialValues: initialValues,
 
-  const submitHandler = useCallback((data) => {
-    data.preventDefault();
+    validationSchema: schema,
 
-    /*let parameter = {
-      name: user,
-      email: email,
-      phone: phone,
-      key_password: key_password
-    }
-  /*  axios.post('http://localhost:8080/user/', parameter)
-      .then(response => {
-        debugger
-        console.log(response)
-        console.log(parameter)
-      })
-      .catch(error => {
-        console.log(error)
-      })*/
-  }, []);
+    onSubmit: useCallback(async (data) => {
+
+      try {
+        await schema.validate(data, {
+          abortEarly: false
+        })
+
+        let parameter = {
+          name: data.name,
+          key_password: data.password,
+          email: data.email,
+        }
+
+        await Api.post("/user/register", parameter)
+          .then(response => {
+            console.log(response);
+          });
+
+      } catch (error) {
+        if (error instanceof yup.ValidationError) {
+          const erros = getValidationError(error);
+          erros.forEach(err => {
+            addToast({
+              type: 'error',
+              title: "Erro Autenticação da Pagina",
+              description: err
+            });
+          });
+          return;
+        }
+      };
+
+    }, [])
+
+  });
+
+
+
+
 
   return (
-    <PageContainer>
-      <PageArea>
-        <Form onSubmit={submitHandler} >
-          <div  layout="row" >
-            <Input type="text" name="user" placeholder="Nome" />
-            <Input type="email" name="email" placeholder="Email" required />
-            <Input type="phone" name="phone" placeholder="Telefone" required />
-            <Input type="password" name="key_password" placeholder="Senha" required />
-          </div>
-          <Button type="submit">Cadastrar</Button>
-        </Form>
-      </PageArea>
-    </PageContainer>
-  )
-};
+    <Container >
+      <Form onReset={formik.resetForm} onSubmit={formik.handleSubmit} noValidate >
+        <h2>Cadastro Usuario </h2>
+        <hr/>
+        <Form.Row md={1}>
+          <Form.Group as={Col} controlId="name" >
+            <TextField
+              fullWidth
+              id="name"
+              inputProps={{ maxLenght: 10 }}
+              name="name"
+              label="Nome"
+              value={formik.values.name}
+              onChange={formik.handleChange}
+              error={formik.touched.name && Boolean(formik.errors.name)}
+              helperText={formik.touched.name && formik.errors.name}
+            />
+          </Form.Group>
+        </Form.Row>
+        <Form.Row>
+          <Form.Group as={Col} controlId="email">
+            <TextField
+              fullWidth
+              id="email"
+              name="email"
+              label="E-mail"
+              type="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
+            />
+          </Form.Group>
+        </Form.Row>
+        <Form.Row>
+          <Form.Group as={Col} controlId="password">
+            <TextField
+              fullWidth
+              id="password"
+              name="password"
+              label="Senha "
+              type="password"
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
+            />
+          </Form.Group>
+          <Form.Group as={Col} controlId="passwordCheck">
+            <TextField
+              fullWidth
+              id="passwordCheck"
+              name="passwordCheck"
+              type="password"
+              label="Confirme a Senha"
+              value={formik.values.passwordCheck}
+              onChange={formik.handleChange}
+              error={formik.touched.passwordCheck && Boolean(formik.errors.passwordCheck)}
+              helperText={formik.touched.passwordCheck && formik.errors.passwordCheck}
+            />
+          </Form.Group>
+        </Form.Row>
+        <Button type="submit">Cadastrar     </Button>
+      </Form>
+    </Container >
+  );
 
-export default Page;
 
-Page.propTypes = {
-  user: PropTypes.string,
-  email: PropTypes.string,
-  key_password: PropTypes.string,
-  phone: PropTypes.string
-};
+}
 
-
-
+export default Pets;

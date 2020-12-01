@@ -2,11 +2,11 @@ import styled from "styled-components";
 
 
 
-export const PageArea = styled.div`
+export const Container = styled.div`
   form {
-    position: relative;
+    position: absolute;
     display:1;
-    border-radius: 3px;
+    border-radius: 5px;
     padding-top: 20px;
     padding-bottom: 20px;
     box-shadow: 0px 0px 3px #999;
