@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Form, Modal, Col, Button, Row } from "react-bootstrap";
 import { Container } from "./styled";
 import Api from "../../helpers/Api";
@@ -6,6 +6,8 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
+
+const token = localStorage.getItem("");
 
 const schema = yup.object().shape({
   name: yup.string().required("Insira a Razão Social do Forncedor"),
@@ -24,6 +26,15 @@ const Supplier = () => {
   const [show, setShow] = useState(false);
   const handleModal = () => setShow(!show ? true : false);
   const { addToast } = useToast();
+
+  async function loadSupplier() {
+    const response = await Api.get("/suplier/findAll");
+    console.log(response.data);
+  }
+
+  useEffect(() => {
+    loadSupplier();
+  }, []);
 
   const formik = useFormik({
     initialValues: initialValues,
@@ -44,9 +55,7 @@ const Supplier = () => {
           cpfCnpj: data.cpfCnpj,
         };
 
-        await Api.post("/suplier", parameter).then((response) => {
-          console.log(response);
-        });
+        await Api.post("/suplier", parameter).then((response) => {});
       } catch (error) {
         if (error instanceof yup.ValidationError) {
           const erros = getValidationError(error);
