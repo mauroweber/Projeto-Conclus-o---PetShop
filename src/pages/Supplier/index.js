@@ -39,9 +39,9 @@ const Supplier = () => {
 
         let parameter = {
           name: data.name,
-          doctorName: data.doctorName,
-          color: data.color,
-          sex: data.sex,
+          companyName: data.companyName,
+          phone: data.phone,
+          cpfCnpj: data.cpfCnpj,
         };
 
         await Api.post("/suplier", parameter).then((response) => {
@@ -111,16 +111,15 @@ const Supplier = () => {
                   name="companyName"
                   value={formik.values.companyName}
                   onChange={formik.handleChange}
-                  isValid={
-                    formik.touched.companyName && !formik.errors.companyName
+                  isInvalid={
+                    formik.touched.companyName &&
+                    Boolean(formik.errors.companyName)
                   }
                 />
                 <Form.Control.Feedback type="invalid" tooltip>
                   {formik.errors.companyName}
                 </Form.Control.Feedback>
               </Form.Group>
-            </Form.Row>
-            <Form.Row>
               <Form.Group as={Col} controlId="phone">
                 <Form.Label>Telefone:</Form.Label>
                 <Form.Control
@@ -130,84 +129,41 @@ const Supplier = () => {
                   isValid={formik.touched.phone && !formik.errors.phone}
                 />
                 <Form.Control.Feedback type="invalid" tooltip>
+                  {formik.errors.phone}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Form.Row>
+
+            <Form.Row>
+              <Form.Group as={Col} controlId="cpfCnpj">
+                <Form.Label>CNPJ: </Form.Label>
+                <Form.Control
+                  name="cpfCnpj"
+                  value={formik.values.cpfCnpj}
+                  onChange={formik.handleChange}
+                  isValid={formik.touched.cpfCnpj && !formik.errors.cpfCnpj}
+                />
+                <Form.Control.Feedback type="invalid" tooltip>
                   {formik.errors.cpfCnpj}
                 </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group as={Row} controlId="address">
-                <Form.Row>
-                  <Form.Group as={Col} controlId="doctorName">
-                    <Form.Label>CNPJ: </Form.Label>
-                    <Form.Control
-                      name="cpfCnpj"
-                      value={formik.values.cpfCnpj}
-                      onChange={formik.handleChange}
-                      isValid={formik.touched.cpfCnpj && !formik.errors.cpfCnpj}
-                    />
-                    <Form.Control.Feedback type="invalid" tooltip>
-                      {formik.errors.name}
-                    </Form.Control.Feedback>
-                    <Form.Control.Feedback tooltip>
-                      Looks good!
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </Form.Row>
+            </Form.Row>
+            <Form.Row>
+              <Form.Group as={Col} controlId="address">
+                <Form.Label>Endereço: </Form.Label>
+                <Form.Control
+                  name="address"
+                  value={formik.values.address}
+                  onChange={formik.handleChange}
+                  isValid={formik.touched.address && !formik.errors.address}
+                />
                 <Form.Control.Feedback type="invalid" tooltip>
                   {formik.errors.address}
                 </Form.Control.Feedback>
-                <Form.Control.Feedback tooltip>
-                  Looks good!
-                </Form.Control.Feedback>
               </Form.Group>
+            </Form.Row>
 
-              <Form.Group as={Col} controlId="birthday">
-                <Form.Label>Data de Nascimento</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="birthday"
-                  value={formik.values.birthday}
-                  onChange={formik.handleChange}
-                  isValid={formik.touched.birthday && !formik.errors.birthday}
-                />
-              </Form.Group>
-            </Form.Row>
-            <Form.Row>
-              <Form.Group as={Col} controlId="cor">
-                <Form.Label>Cor Pet</Form.Label>
-                <Form.Control
-                  as="select"
-                  name="cor"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isValid={formik.touched.cor && !formik.errors.cor}
-                >
-                  <option value="defaul">-- Nenhum --</option>
-                </Form.Control>
-              </Form.Group>
-
-              <Form.Group as={Col} controlId="formGridEmail">
-                <Form.Label>Raça: </Form.Label>
-                <Form.Control
-                  name="raca"
-                  value={formik.values.raca}
-                  onChange={formik.handleChange}
-                  isValid={formik.touched.raca && !formik.errors.raca}
-                />
-              </Form.Group>
-            </Form.Row>
-            <Form.Row>
-              <Form.Group as={Col} controlId="id-description">
-                <Form.Label>Restrições/Observação</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  name="recommendations"
-                  value={formik.values.recommendations}
-                  onChange={formik.handleChange}
-                  required
-                />
-              </Form.Group>
-            </Form.Row>
-            <Button type="submit">Cadastrar </Button>
+            <Button type="submit">Cadastrar Fornecedor</Button>
           </Form>
         </Modal.Body>
       </Modal>
