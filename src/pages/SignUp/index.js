@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback} from "react";
 import { useHistory } from "react-router-dom";
-import { Typography, Form, Modal, Col, Button, Row } from "react-bootstrap";
-import { TextField } from "@material-ui/core";
-import { Container } from "./styled";
+import { Form, Col, Button } from "react-bootstrap";
 import Api from "../../helpers/Api";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
 import Swal from 'sweetalert2';
+import { TextField, Container } from "@material-ui/core";
 
 const schema = yup.object().shape({
   name: yup.string().required("Insira o nome do Pet"),
@@ -51,12 +50,12 @@ const Pets = () => {
             Swal.fire({
               position: 'center',
               icon: 'success',
-              title: 'Cadastrado com Sucesso',              
+              title: 'Cadastrado com Sucesso',
               showConfirmButton: false,
               timer: 1500
             })
             setTimeout(() => {
-              history.push("/signin");              
+              history.push("/signin");
             }, 1500);
           });
 
@@ -74,7 +73,7 @@ const Pets = () => {
         }
       };
 
-    }, [])
+    }, [addToast, history])
 
   });
 
@@ -83,16 +82,15 @@ const Pets = () => {
 
 
   return (
-    <Container >
-      <Form onReset={formik.resetForm} onSubmit={formik.handleSubmit} noValidate >
+    <Container maxWidth="sm" component="main">
+      <Form onReset={formik.resetForm} onSubmit={formik.handleSubmit} noValidate style={{ marginTop: "150px", padding: "35px", boxShadow: "0px 0px 4px #9999", borderRadius: "10px" }}>
         <h2>Cadastro Usuario </h2>
-        <hr/>
+        <hr />
         <Form.Row md={1}>
           <Form.Group as={Col} controlId="name" >
             <TextField
               fullWidth
               id="name"
-              inputProps={{ maxLenght: 10 }}
               name="name"
               label="Nome"
               value={formik.values.name}
@@ -129,6 +127,7 @@ const Pets = () => {
               onChange={formik.handleChange}
               error={formik.touched.password && Boolean(formik.errors.password)}
               helperText={formik.touched.password && formik.errors.password}
+              autoComplete="off"
             />
           </Form.Group>
           <Form.Group as={Col} controlId="passwordCheck">
@@ -142,6 +141,7 @@ const Pets = () => {
               onChange={formik.handleChange}
               error={formik.touched.passwordCheck && Boolean(formik.errors.passwordCheck)}
               helperText={formik.touched.passwordCheck && formik.errors.passwordCheck}
+              autoComplete = "off"
             />
           </Form.Group>
         </Form.Row>
