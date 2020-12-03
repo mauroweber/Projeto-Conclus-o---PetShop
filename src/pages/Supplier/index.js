@@ -1,11 +1,20 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { Form, Modal, Col, Button, Row } from "react-bootstrap";
-import { Container } from "./styled";
+import {
+  Form,
+  Modal,
+  Col,
+  Button,
+  Row,
+  Table,
+  Container,
+} from "react-bootstrap";
+// import { Container } from "./styled";
 import Api from "../../helpers/Api";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
+import { FaTrash, FaEdit } from "react-icons/fa";
 
 const token = localStorage.getItem("");
 
@@ -26,10 +35,18 @@ const Supplier = () => {
   const [show, setShow] = useState(false);
   const handleModal = () => setShow(!show ? true : false);
   const { addToast } = useToast();
+  const [supliers, setSuppliers] = useState([]);
+  const [edit, setEdit] = useState(false);
+  const [idEdit, setIdEdit] = useState();
 
   async function loadSupplier() {
     const response = await Api.get("/suplier/findAll");
-    console.log(response.data);
+    setSuppliers(response.data);
+  }
+
+  async function handleDelete(id) {
+    await Api.delete(`/suplier/${id}`);
+    loadSupplier();
   }
 
   useEffect(() => {
@@ -42,7 +59,7 @@ const Supplier = () => {
     validationSchema: schema,
 
     onSubmit: useCallback(async (data) => {
-      console.log(data);
+      //console.log(data);
       try {
         await schema.validate(data, {
           abortEarly: false,
@@ -55,7 +72,11 @@ const Supplier = () => {
           cpfCnpj: data.cpfCnpj,
         };
 
-        await Api.post("/suplier", parameter).then((response) => {});
+        await Api.post("/suplier", parameter).then((response) => {
+          loadSupplier();
+          setShow(false);
+          formik.resetForm();
+        });
       } catch (error) {
         if (error instanceof yup.ValidationError) {
           const erros = getValidationError(error);
@@ -73,11 +94,26 @@ const Supplier = () => {
               description: e,
             });
           });
+
           return;
         }
       }
     }, []),
   });
+
+  async function loadUpdate(id, name, companyName, phone, cpfCnpj) {
+    formik.values.name = name;
+    formik.values.companyName = companyName;
+    formik.values.phone = phone;
+    formik.values.cpfCnpj = cpfCnpj;
+    setIdEdit(id);
+    setEdit(true);
+    handleModal();
+  }
+
+  async function handleUpdate(id) {
+    console.log(id);
+  }
 
   return (
     <Container>
@@ -90,12 +126,14 @@ const Supplier = () => {
         keyboard={false}
       >
         <Modal.Header closeButton>
-          <Modal.Title>CADASTRO DE FORNECEDOR</Modal.Title>
+          <Modal.Title>
+            {(edit && "EDIÇÃO DE FORNECEDOR") || "CADASTRO DE FORNECEDOR"}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form
             onReset={formik.resetForm}
-            onSubmit={formik.handleSubmit}
+            onSubmit={(edit && handleUpdate(idEdit)) || formik.handleSubmit}
             noValidate
           >
             <Form.Row>
@@ -172,10 +210,50 @@ const Supplier = () => {
               </Form.Group>
             </Form.Row>
 
-            <Button type="submit">Cadastrar Fornecedor</Button>
+            <Button type="submit">
+              {(edit && "Editar Fornecedor") || "Cadastrar Fornecedor"}
+            </Button>
           </Form>
         </Modal.Body>
       </Modal>
+
+      <Table striped bordered hover size="sm">
+        <thead>
+          <tr>
+            <th>Razão Social</th>
+            <th>Nome Fantasia</th>
+            <th>Telefone</th>
+            <th>CNPJ/CPF</th>
+            <th>Endereço</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {supliers.map((sup) => (
+            <tr>
+              <td>{sup.name}</td>
+              <td>{sup.companyName}</td>
+              <td>{sup.phone}</td>
+              <td>{sup.cpfCnpj}</td>
+              <td>{sup.address}</td>
+              <td>
+                <FaTrash onClick={(e) => handleDelete(sup.id)} />
+                <FaEdit
+                  onClick={(e) =>
+                    loadUpdate(
+                      sup.id,
+                      sup.name,
+                      sup.companyName,
+                      sup.phone,
+                      sup.cpfCnpj
+                    )
+                  }
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </Container>
   );
 };
