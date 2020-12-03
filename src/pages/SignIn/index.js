@@ -44,6 +44,7 @@ const SignIn = () => {
   const { addToast } = useToast();
 
   const submitHandler = useCallback(async (data) => {
+    console.log(data);
     try {
       formRef.current.setErrors({});
       const schema = Yup.object().shape({
@@ -71,24 +72,26 @@ const SignIn = () => {
       });
 
     } catch (erro) {
-      if (erro instanceof Yup.ValidationError) {
+      if (erro instanceof Yup.ValidationError) {debugger
         const erros = getValidationError(erro);
         formRef.current.setErrors(erros);
-        erro.errors.map((e) => {
+        erro.errors.forEach(err => {
           addToast({
             type: 'error',
             title: "Erro Autenticação da Pagina",
-            description: e
+            description: err
           });
-        });
+        });        
         return;
       }
 
-      addToast({
-        type: 'error',
-        title: "Erro na Autenticação",
-        description: "Verifique as credenciais"
-      });
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'Usuario ou Senha invalida',              
+        showConfirmButton: false,
+        timer: 2000
+      })
     };
   }, [signIn, addToast]);
   return (
@@ -113,6 +116,7 @@ const SignIn = () => {
               icon={FiLock}
               type="password"
               placeholder="Senha"
+              autoComplete = "off"
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}

@@ -1,13 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Form, Modal, Col, Button, Row } from "react-bootstrap";
-import { TextField } from "@material-ui/core"
-import { Container } from "./styled";
+import { Typography, Container, TableCell, Table, TableBody, TableHead, TableRow } from "@material-ui/core";
+import CreateIcon from '@material-ui/icons/Create';
+import DeleteIcon from '@material-ui/icons/Delete';
+//import { Container } from "./styled";
 import Api from "../../helpers/Api";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
 import Swal from 'sweetalert2';
+import api from "../../helpers/Api";
 
 const cores = [
   { id: 1, cor: "Preto" },
@@ -45,10 +48,33 @@ const initialValues = {
   recommendations: "",
 };
 
+
+
 const Pets = () => {
   const [show, setShow] = useState(false);
   const handleModal = () => setShow(!show ? true : false);
   const { addToast } = useToast();
+  const [pets, setPets] = useState([]);
+  const formRef = useRef(null);
+  console.log(formRef);
+
+  const loadPets = async () => {
+    await api.get("pets/findAll").then(response => {
+      setPets(response.data);
+    })
+  }
+
+  const deletePets = async (id) =>{
+    await api.delete("pets/" + id).then(response => {
+       setPets([...pets.filter(p => p.id !== id)]);
+      });
+  }
+
+  useEffect(() => {
+    loadPets();
+
+
+  }, []);
 
 
 
@@ -103,7 +129,7 @@ const Pets = () => {
         }
       };
 
-    }, []),
+    }, [addToast, formRef]),
 
     onReset: { initialValues },
 
@@ -114,7 +140,7 @@ const Pets = () => {
 
 
   return (
-    <Container>
+    <Container maxWidth="xl" >
       <h1>Page Pets</h1>
       <button onClick={handleModal}>
         Cadastrar Pet
@@ -128,7 +154,7 @@ const Pets = () => {
           <Modal.Title>Cadastro do Pet</Modal.Title>
         </Modal.Header>
         <Modal.Body >
-          <Form onReset={formik.resetForm} onSubmit={formik.handleSubmit} noValidate>
+          <Form ref={formRef} onReset={formik.resetForm} onSubmit={formik.handleSubmit} noValidate>
             <Form.Row>
               <Form.Group as={Col} controlId="name">
                 <Form.Label>Nome Pet: </Form.Label>
@@ -137,23 +163,12 @@ const Pets = () => {
                   name="name"
                   value={formik.values.name}
                   onChange={formik.handleChange}
-                  // isValid={formik.touched.name && Boolean(formik.errors.name)}
                   isInvalid={formik.touched.name && Boolean(formik.errors.name)}
                 />
                 <Form.Control.Feedback type="invalid" tooltip>
                   {formik.errors.name}
                 </Form.Control.Feedback>
                 <Form.Control.Feedback type="valid" tooltip>Looks good!</Form.Control.Feedback>
-                {/* <TextField
-                  fullWidth
-                  id="name"
-                  name="name"
-                  label="Nome"
-                  value={formik.values.name}
-                  onChange={formik.handleChange}
-                  error={formik.touched.name && Boolean(formik.errors.name)}
-                  helperText={formik.touched.name && formik.errors.name}
-                /> */}
               </Form.Group>
             </Form.Row>
             <Form.Row>
@@ -227,7 +242,7 @@ const Pets = () => {
                   <option value="defaul">-- Nenhum --</option>
                   {cores.map(cor => {
                     return (
-                      <option value={cor.id}>{cor.cor}</option>)
+                      <option key={cor.id} value={cor.id}>{cor.cor}</option>)
                   })
                   }
                 </Form.Control>
@@ -260,11 +275,50 @@ const Pets = () => {
           </Form>
         </Modal.Body>
       </Modal>
+      <Typography variant="h4" style={style}>User Details</Typography>
+      <Button variant="contained" color="primary" onClick={() => this.addUser()}>
+        Add User
+      </Button>
+
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Id</TableCell>
+            <TableCell>FirstName</TableCell>
+            <TableCell align="right">Nome Pet</TableCell>
+            <TableCell align="right">Sexo</TableCell>
+            <TableCell align="right">Dono</TableCell>
+            <TableCell align="right">Cor</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {pets.map(pet => (
+            <TableRow key={pet.id}>
+              <TableCell component="th" scope="pet">
+                {pet.id}
+              </TableCell>
+              <TableCell align="right">{pet.name}</TableCell>
+              <TableCell align="right">{pet.sex}</TableCell>
+              <TableCell align="right">{pet.user}</TableCell>
+              <TableCell align="right">{pet.color}</TableCell>
+              {/* <TableCell align="right" onClick={() => this.editUser(pet.id)}><CreateIcon /></TableCell> */}
+              <TableCell align="right" onClick={() => deletePets(pet.id)}><DeleteIcon /></TableCell> 
+
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
 
     </Container >
   );
 
 
+}
+
+const style = {
+  display: 'flex',
+  justifyContent: 'center'
 }
 
 export default Pets;
