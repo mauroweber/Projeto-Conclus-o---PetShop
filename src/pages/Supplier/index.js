@@ -16,8 +16,6 @@ import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
 import { FaTrash, FaEdit } from "react-icons/fa";
 
-const token = localStorage.getItem("");
-
 const schema = yup.object().shape({
   name: yup.string().required("Insira a Razão Social do Forncedor"),
   companyName: yup.string().required("Insera o Nome Fantasia da Empresa"),
@@ -38,6 +36,15 @@ const Supplier = () => {
   const [supliers, setSuppliers] = useState([]);
   const [edit, setEdit] = useState(false);
   const [idEdit, setIdEdit] = useState();
+
+  function handleOut() {
+    setEdit(false);
+    formik.values.name = "";
+    formik.values.companyName = "";
+    formik.values.phone = "";
+    formik.values.cpfCnpj = "";
+    setShow(false);
+  }
 
   async function loadSupplier() {
     const response = await Api.get("/suplier/findAll");
@@ -73,6 +80,7 @@ const Supplier = () => {
         };
 
         await Api.post("/suplier", parameter).then((response) => {
+          //console.log(parameter);
           loadSupplier();
           setShow(false);
           formik.resetForm();
@@ -111,8 +119,24 @@ const Supplier = () => {
     handleModal();
   }
 
-  async function handleUpdate(id) {
-    console.log(id);
+  async function handleUpdate(e) {
+    e.preventDefault();
+    const parameter = {
+      name: formik.values.name,
+      companyName: formik.values.companyName,
+      phone: formik.values.phone,
+      cpfCnpj: formik.values.cpfCnpj,
+    };
+    console.log(parameter);
+    await Api.put(`/suplier/${idEdit}`, parameter);
+    setEdit(false);
+    setShow(false);
+    loadSupplier();
+    //Limpa os dados do Modal depois de editado
+    formik.values.name = "";
+    formik.values.companyName = "";
+    formik.values.phone = "";
+    formik.values.cpfCnpj = "";
   }
 
   return (
@@ -125,7 +149,7 @@ const Supplier = () => {
         backdrop="static"
         keyboard={false}
       >
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>
             {(edit && "EDIÇÃO DE FORNECEDOR") || "CADASTRO DE FORNECEDOR"}
           </Modal.Title>
@@ -133,7 +157,7 @@ const Supplier = () => {
         <Modal.Body>
           <Form
             onReset={formik.resetForm}
-            onSubmit={(edit && handleUpdate(idEdit)) || formik.handleSubmit}
+            onSubmit={(edit && handleUpdate) || formik.handleSubmit}
             noValidate
           >
             <Form.Row>
@@ -209,10 +233,14 @@ const Supplier = () => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Form.Row>
-
-            <Button type="submit">
-              {(edit && "Editar Fornecedor") || "Cadastrar Fornecedor"}
-            </Button>
+            <div>
+              <Button type="submit" variant="success" size="lg">
+                {(edit && "Editar Fornecedor") || "Cadastrar Fornecedor"}
+              </Button>
+              <Button variant="danger" size="sm" onClick={handleOut}>
+                Sair
+              </Button>
+            </div>
           </Form>
         </Modal.Body>
       </Modal>
