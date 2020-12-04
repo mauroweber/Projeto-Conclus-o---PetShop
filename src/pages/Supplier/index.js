@@ -7,6 +7,7 @@ import {
   Row,
   Table,
   Container,
+  Badge,
 } from "react-bootstrap";
 // import { Container } from "./styled";
 import Api from "../../helpers/Api";
@@ -141,8 +142,21 @@ const Supplier = () => {
 
   return (
     <Container>
-      <h1>CADASTRAR FORNECEDOR</h1>
-      <button onClick={handleModal}>CADASTRAR FORNECEDOR</button>
+      <Row>
+        <Col>
+          <h1 style={{ textAlign: "center" }}>
+            <Badge variant="secondary">CADASTRAR FORNECEDOR</Badge>
+          </h1>
+          <Button
+            variant="outline-primary"
+            style={{ textAlign: "center" }}
+            onClick={handleModal}
+          >
+            CADASTRAR FORNECEDOR
+          </Button>
+        </Col>
+      </Row>
+
       <Modal
         show={show}
         onHide={handleModal}
