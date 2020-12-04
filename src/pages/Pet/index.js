@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Form, Modal, Col, Button, Row } from "react-bootstrap";
-import { Typography, Container, TableCell, Table, TableBody, TableHead, TableRow } from "@material-ui/core";
+import { Typography, Container, TableCell, Table, TableBody, TableHead, TableRow, SvgIcon } from "@material-ui/core";
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
 //import { Container } from "./styled";
@@ -11,6 +11,9 @@ import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
 import Swal from 'sweetalert2';
 import api from "../../helpers/Api";
+import { margin } from "polished";
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import { green } from "@material-ui/core/colors";
 
 const cores = [
   { id: 1, cor: "Preto" },
@@ -49,14 +52,14 @@ const initialValues = {
 };
 
 
-
 const Pets = () => {
   const [show, setShow] = useState(false);
   const handleModal = () => setShow(!show ? true : false);
   const { addToast } = useToast();
   const [pets, setPets] = useState([]);
-  const formRef = useRef(null);
-  console.log(formRef);
+  const [isEdit, setIsEdit] = useState(false);
+  const [id, setId] = useState(null);
+  const switt = useRef();
 
   const loadPets = async () => {
     await api.get("pets/findAll").then(response => {
@@ -64,19 +67,16 @@ const Pets = () => {
     })
   }
 
-  const deletePets = async (id) =>{
+
+  const deletePets = async (id) => {
     await api.delete("pets/" + id).then(response => {
-       setPets([...pets.filter(p => p.id !== id)]);
-      });
+      setPets([...pets.filter(p => p.id !== id)]);
+    });
   }
 
   useEffect(() => {
     loadPets();
-
-
   }, []);
-
-
 
   const formik = useFormik({
     initialValues: initialValues,
@@ -84,16 +84,16 @@ const Pets = () => {
     validationSchema: schema,
 
     onSubmit: useCallback(async (data) => {
-      console.log(data);
       try {
+        console.log("aquiSDFFFFFFFFF");
         await schema.validate(data, {
           abortEarly: false
-        })
+        });
 
         let parameter = {
           name: data.name,
           doctorName: data.doctorName,
-          color: data.color,
+          color: data.cor,
           sex: data.sex
         }
 
@@ -127,34 +127,112 @@ const Pets = () => {
           });
           return;
         }
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Erro na Atualização',
+          showConfirmButton: false,
+          timer: 2000
+        })
       };
 
-    }, [addToast, formRef]),
 
-    onReset: { initialValues },
+    }, [addToast])
 
   });
+  const updatePet = async (pet) => {
+    setIsEdit(true);
+    handleModal();
+    formik.values.name = pet.name;
+    formik.values.doctorName = pet.doctorName;
+    formik.values.cor = pet.cor;
+    formik.values.raca = pet.raca;
+    formik.values.recommendations = pet.raca;
+    formik.values.sex = pet.sex;
+    formik.values.birthday = new Date(pet.birthday);
+  };
 
 
+  const handleChangeUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      let parameter = {
+        name: formik.values.name,
+        doctorName: formik.values.doctorName,
+        color: formik.values.cor,
+        sex: formik.values.sex,
+        birthday: formik.values.birthday
+      }
+      await api.put("/pets/" + id, parameter).then(resp => {
+        handleModal();
+        setId(null);
+        setIsEdit(false);
+        loadPets();
+        cleanFormik();
+      })
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        const erros = getValidationError(error);
+        erros.forEach(err => {
+          addToast({
+            type: 'error',
+            title: "Erro Autenticação da Pagina",
+            description: err
+          });
+        });
+        error.erros.map((e) => {
+          addToast({
+            type: 'error',
+            title: "Erro Autenticação da Pagina",
+            description: e
+          });
+        });
+        return;
+      }
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'Erro na Atualização',
+        showConfirmButton: false,
+        timer: 2000
+      })
+    };
 
+  };
+
+  const cleanFormik = () => {
+    formik.values.name = "";
+    formik.values.cor = "";
+    formik.values.raca = "";
+    formik.values.recommendations = "";
+    formik.values.sex = "";
+    formik.values.birthday = new Date();
+    setIsEdit(false);
+  };
+
+  const formatDate = (dt) => {
+    let date = new Date(dt);
+    return (date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
+  }
 
 
   return (
     <Container maxWidth="xl" >
-      <h1>Page Pets</h1>
-      <button onClick={handleModal}>
-        Cadastrar Pet
-    </button>
+      <SvgIcon style={{ fontSize: 50, color:green[900]  }} 
+      component={AddCircleIcon} 
+      onClick={handleModal}
+      />
+
       <Modal
         show={show}
         onHide={handleModal}
         backdrop="static"
         keyboard={false}>
-        <Modal.Header closeButton>
-          <Modal.Title>Cadastro do Pet</Modal.Title>
+        <Modal.Header closeButton onHide={() => cleanFormik()} >
+          <Modal.Title>{(isEdit && "Atualizar Pet") || "Cadastro do Pet"}</Modal.Title>
         </Modal.Header>
         <Modal.Body >
-          <Form ref={formRef} onReset={formik.resetForm} onSubmit={formik.handleSubmit} noValidate>
+          <Form onSubmit={(isEdit && handleChangeUpdate) || formik.handleSubmit} noValidate>
             <Form.Row>
               <Form.Group as={Col} controlId="name">
                 <Form.Label>Nome Pet: </Form.Label>
@@ -168,7 +246,6 @@ const Pets = () => {
                 <Form.Control.Feedback type="invalid" tooltip>
                   {formik.errors.name}
                 </Form.Control.Feedback>
-                <Form.Control.Feedback type="valid" tooltip>Looks good!</Form.Control.Feedback>
               </Form.Group>
             </Form.Row>
             <Form.Row>
@@ -178,17 +255,16 @@ const Pets = () => {
                   name="doctorName"
                   value={formik.values.doctorName}
                   onChange={formik.handleChange}
-                  isValid={formik.touched.doctorName && !formik.errors.doctorName}
+                  isInvalid={formik.touched.doctorName && !formik.errors.doctorName}
                 />
                 <Form.Control.Feedback type="invalid" tooltip>
                   {formik.errors.name}
                 </Form.Control.Feedback>
-                <Form.Control.Feedback tooltip>Looks good!</Form.Control.Feedback>
               </Form.Group>
             </Form.Row>
 
             <Form.Row>
-              <fieldset>
+              <fieldset ref={switt}>
                 <Form.Group as={Row} controlId="sex">
                   <Form.Label as="legend" column sm={3}>
                     Sexo
@@ -198,7 +274,7 @@ const Pets = () => {
                       type="radio"
                       label="Masculino"
                       name="sex"
-                      value="masculino"
+                      value="Masculino"
                       onChange={formik.handleChange}
                       isInvalid={!!formik.errors.sex}
                     />
@@ -206,14 +282,13 @@ const Pets = () => {
                       type="radio"
                       label="Feminino"
                       name="sex"
-                      value="feminino"
+                      value="Feminino"
                       isInvalid={formik.errors.sex}
                     />
                   </Col>
                   <Form.Control.Feedback type="invalid" tooltip>
                     {formik.errors.sex}
                   </Form.Control.Feedback>
-                  <Form.Control.Feedback tooltip>Looks good!</Form.Control.Feedback>
                 </Form.Group>
               </fieldset>
 
@@ -224,12 +299,11 @@ const Pets = () => {
                   name="birthday"
                   value={formik.values.birthday}
                   onChange={formik.handleChange}
-                  isValid={formik.touched.birthday && !formik.errors.birthday}
+                  isInvalid={formik.touched.birthday && !formik.errors.birthday}
                 />
               </Form.Group>
             </Form.Row>
             <Form.Row>
-
               <Form.Group as={Col} controlId="cor">
                 <Form.Label>Cor Pet</Form.Label>
                 <Form.Control
@@ -237,12 +311,12 @@ const Pets = () => {
                   name="cor"
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  isValid={formik.touched.cor && !formik.errors.cor}
+                  isInvalid={formik.touched.cor && !formik.errors.cor}
                 >
                   <option value="defaul">-- Nenhum --</option>
                   {cores.map(cor => {
                     return (
-                      <option key={cor.id} value={cor.id}>{cor.cor}</option>)
+                      <option key={cor.id} value={cor.cor}>{cor.cor}</option>)
                   })
                   }
                 </Form.Control>
@@ -254,7 +328,7 @@ const Pets = () => {
                   name="raca"
                   value={formik.values.raca}
                   onChange={formik.handleChange}
-                  isValid={formik.touched.raca && !formik.errors.raca}
+                  isInvalid={formik.touched.raca && !formik.errors.raca}
                 />
               </Form.Group>
             </Form.Row>
@@ -271,24 +345,23 @@ const Pets = () => {
                 />
               </Form.Group>
             </Form.Row>
-            <Button type="submit">Cadastrar </Button>
+            <Button type="submit">{(isEdit && "Editar Pet") || "Cadastrar"} </Button>
           </Form>
         </Modal.Body>
       </Modal>
-      <Typography variant="h4" style={style}>User Details</Typography>
-      <Button variant="contained" color="primary" onClick={() => this.addUser()}>
-        Add User
-      </Button>
-
+      <Typography variant="h4" style={style}>Pets Cadastrados</Typography>
+      <hr />
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>Id</TableCell>
-            <TableCell>FirstName</TableCell>
             <TableCell align="right">Nome Pet</TableCell>
+            <TableCell align="right">Nome Veterinario</TableCell>
             <TableCell align="right">Sexo</TableCell>
+            <TableCell align="right">Aniversario</TableCell>
             <TableCell align="right">Dono</TableCell>
             <TableCell align="right">Cor</TableCell>
+            <TableCell />
           </TableRow>
         </TableHead>
         <TableBody>
@@ -298,11 +371,15 @@ const Pets = () => {
                 {pet.id}
               </TableCell>
               <TableCell align="right">{pet.name}</TableCell>
+              <TableCell align="right">{pet.doctorName}</TableCell>
               <TableCell align="right">{pet.sex}</TableCell>
+              <TableCell align="right">{formatDate(pet.birthday)}</TableCell>
               <TableCell align="right">{pet.user}</TableCell>
               <TableCell align="right">{pet.color}</TableCell>
-              {/* <TableCell align="right" onClick={() => this.editUser(pet.id)}><CreateIcon /></TableCell> */}
-              <TableCell align="right" onClick={() => deletePets(pet.id)}><DeleteIcon /></TableCell> 
+              <TableCell align="right" >
+                <CreateIcon onClick={() => updatePet(pet)} />
+                <DeleteIcon style={{ margin: "10px 10px 0 15px" }} onClick={() => deletePets(pet.id)} />
+              </TableCell>
 
             </TableRow>
           ))}
