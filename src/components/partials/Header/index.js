@@ -1,10 +1,19 @@
 import React, { useCallback } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { HeaderArea, Container } from "./styled";
-import { FiLogOut } from "react-icons/fi";
-import dog from "../../assets/dog.png"
+import { useLocation } from "react-router-dom";
+import dog from "../../assets/dog.png";
+
+import { Navbar, Nav } from "react-bootstrap";
 
 import { useAuth } from "../../../hooks/auth";
+import {
+  FaHome,
+  FaUserPlus,
+  FaPlusSquare,
+  FaPaw,
+  FaTruck,
+  FaSignOutAlt,
+} from "react-icons/fa";
+import "./style.css";
 
 const Header = () => {
   const { signOut, token } = useAuth();
@@ -15,40 +24,78 @@ const Header = () => {
   }, [signOut]);
 
   return (
-    <HeaderArea>
-      <Container>
+    <Navbar style={{ background: "#E67E22" }} expand="lg">
+      <Navbar.Brand href="#home">
+        <img style={{ height: 48 }} src={dog} alt="PetsCare" />
+      </Navbar.Brand>
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
+        {!token && locatinPath !== "/signin" ? (
+          <Nav className="ml-auto">
+            <Nav.Link id="menu-link" href="/dashboard">
+              <FaHome style={{ marginRight: 5 }} />
+              Home
+            </Nav.Link>
+            <Nav.Link id="menu-link" href="/addClient">
+              <FaUserPlus style={{ marginRight: 5 }} />
+              Cadastro de Cliente
+            </Nav.Link>
+            <Nav.Link id="menu-link" href="/addproduct">
+              <FaPlusSquare style={{ marginRight: 5 }} />
+              Cadastro de Produto
+            </Nav.Link>
+            <Nav.Link id="menu-link" href="/pets">
+              <FaPaw style={{ marginRight: 5 }} />
+              Pets
+            </Nav.Link>
+            <Nav.Link id="menu-link" href="/supplier">
+              <FaTruck style={{ marginRight: 5 }} />
+              Fornecedor
+            </Nav.Link>
+            <Nav.Link id="menu-link" onClick={handleLogout}>
+              <FaSignOutAlt style={{ marginRight: 5 }} />
+              Sair
+            </Nav.Link>
+            : token ? <Nav.Link href="/addClient"></Nav.Link>
+          </Nav>
+        ) : null}
+      </Navbar.Collapse>
+    </Navbar>
 
-        <Link to="/">
-          <img src={dog} alt="PetsHome" />
-        </Link>
+    // <HeaderArea>
+    //   <Container>
 
-        <div className="Menu">
-          <nav>
-            {!token && locatinPath !== "/signin" ? (
-              <ul>
-                <li>
-                  <Link to="/signin">Login</Link>
-                </li>
-              </ul>
+    //     <Link to="/">
+    //       <img src={dog} alt="PetsHome" />
+    //     </Link>
 
-            ) : token ? (
-              <ul>
-                <li>
-                  <Link to="/addClient">Minha Conta</Link>
-                </li>
-                <li>
-                  <button onClick={handleLogout}>
-                    <FiLogOut size={24} />
-                  </button>
-                </li>
-              </ul>
+    //     <div className="Menu">
+    //       <nav>
+    //         {!token && locatinPath !== "/signin" ? (
+    //           <ul>
+    //             <li>
+    //               <Link to="/signin">Login</Link>
+    //             </li>
+    //           </ul>
 
-            ) : (null)}
+    //         ) : token ? (
+    //           <ul>
+    //             <li>
+    //               <Link to="/addClient">Minha Conta</Link>
+    //             </li>
+    //             <li>
+    //               <button onClick={handleLogout}>
+    //                 <FiLogOut size={24} />
+    //               </button>
+    //             </li>
+    //           </ul>
 
-          </nav>
-        </div>
-      </Container>
-    </HeaderArea>
+    //         ) : (null)}
+
+    //       </nav>
+    //     </div>
+    //   </Container>
+    // </HeaderArea>
   );
 };
 

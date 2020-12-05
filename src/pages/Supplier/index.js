@@ -9,7 +9,7 @@ import {
   Container,
   Badge,
 } from "react-bootstrap";
-// import { Container } from "./styled";
+import "./styled.css";
 import Api from "../../helpers/Api";
 import * as yup from "yup";
 import { useFormik } from "formik";
@@ -110,7 +110,7 @@ const Supplier = () => {
     }, []),
   });
 
-  async function loadUpdate(id, name, companyName, phone, cpfCnpj) {
+  function loadUpdate(id, name, companyName, phone, cpfCnpj) {
     formik.values.name = name;
     formik.values.companyName = companyName;
     formik.values.phone = phone;
@@ -141,21 +141,59 @@ const Supplier = () => {
   }
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          <h1 style={{ textAlign: "center" }}>
-            <Badge variant="secondary">CADASTRAR FORNECEDOR</Badge>
-          </h1>
-          <Button
-            variant="outline-primary"
-            style={{ textAlign: "center" }}
-            onClick={handleModal}
-          >
-            CADASTRAR FORNECEDOR
-          </Button>
-        </Col>
-      </Row>
+    <Col>
+      <Col style={{ textAlign: "center" }}>
+        <Button
+          variant="dark"
+          className="btn-open-suplier"
+          onClick={handleModal}
+        >
+          CADASTRAR FORNECEDOR
+        </Button>
+      </Col>
+
+      <Table style={{ marginTop: 25 }} striped bordered hover size="sm">
+        <thead>
+          <tr>
+            <th>Razão Social</th>
+            <th>Nome Fantasia</th>
+            <th>Telefone</th>
+            <th>CNPJ/CPF</th>
+            <th>Endereço</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {supliers.map((sup) => (
+            <tr>
+              <td>{sup.name}</td>
+              <td>{sup.companyName}</td>
+              <td>{sup.phone}</td>
+              <td>{sup.cpfCnpj}</td>
+              <td>{sup.address}</td>
+              <td>
+                <FaTrash
+                  id="fa-trash"
+                  color="red"
+                  onClick={(e) => handleDelete(sup.id)}
+                />
+                <FaEdit
+                  id="fa-edit"
+                  onClick={(e) =>
+                    loadUpdate(
+                      sup.id,
+                      sup.name,
+                      sup.companyName,
+                      sup.phone,
+                      sup.cpfCnpj
+                    )
+                  }
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
 
       <Modal
         show={show}
@@ -165,7 +203,7 @@ const Supplier = () => {
       >
         <Modal.Header>
           <Modal.Title>
-            {(edit && "EDIÇÃO DE FORNECEDOR") || "CADASTRO DE FORNECEDOR"}
+            {edit ? "EDIÇÃO DE FORNECEDOR" : "CADASTRO DE FORNECEDOR"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -258,45 +296,7 @@ const Supplier = () => {
           </Form>
         </Modal.Body>
       </Modal>
-
-      <Table striped bordered hover size="sm">
-        <thead>
-          <tr>
-            <th>Razão Social</th>
-            <th>Nome Fantasia</th>
-            <th>Telefone</th>
-            <th>CNPJ/CPF</th>
-            <th>Endereço</th>
-            <th>Ação</th>
-          </tr>
-        </thead>
-        <tbody>
-          {supliers.map((sup) => (
-            <tr>
-              <td>{sup.name}</td>
-              <td>{sup.companyName}</td>
-              <td>{sup.phone}</td>
-              <td>{sup.cpfCnpj}</td>
-              <td>{sup.address}</td>
-              <td>
-                <FaTrash onClick={(e) => handleDelete(sup.id)} />
-                <FaEdit
-                  onClick={(e) =>
-                    loadUpdate(
-                      sup.id,
-                      sup.name,
-                      sup.companyName,
-                      sup.phone,
-                      sup.cpfCnpj
-                    )
-                  }
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </Container>
+    </Col>
   );
 };
 
