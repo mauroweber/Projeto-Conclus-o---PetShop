@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Form, Modal, Col, Button, Row } from "react-bootstrap";
-import { Typography, Container, TableCell, Table, TableBody, TableHead, TableRow, SvgIcon } from "@material-ui/core";
+import { Typography, Container, TableCell, Table, TableBody, TableHead, TableRow, SvgIcon, TextField } from "@material-ui/core";
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteIcon from '@material-ui/icons/Delete';
 //import { Container } from "./styled";
@@ -13,7 +13,8 @@ import Swal from 'sweetalert2';
 import api from "../../helpers/Api";
 import { margin } from "polished";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import { green } from "@material-ui/core/colors";
+import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { propTypes } from "react-bootstrap/esm/Image";
 
 const cores = [
   { id: 1, cor: "Preto" },
@@ -45,11 +46,20 @@ const initialValues = {
   name: "",
   doctorName: "",
   sex: "",
-  birthday: new Date(),
+  birthday: propTypes.Date,
   cor: "",
   raca: "",
   recommendations: "",
 };
+
+const useStyles = makeStyles((theme) => ({
+  textField: {
+    "& > *": {
+      marginLeft: theme.spacing.unit,
+      marginRight: theme.spacing.unit,
+    }
+  },
+}));
 
 
 const Pets = () => {
@@ -59,7 +69,7 @@ const Pets = () => {
   const [pets, setPets] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [id, setId] = useState(null);
-  const switt = useRef();
+  const classes = useStyles();
 
   const loadPets = async () => {
     await api.get("pets/findAll").then(response => {
@@ -79,13 +89,15 @@ const Pets = () => {
   }, []);
 
   const formik = useFormik({
+
+
     initialValues: initialValues,
 
     validationSchema: schema,
 
-    onSubmit: useCallback(async (data) => {
+    onSubmit: useCallback(async (data, {setStatus, setSubmitting}) => {
       try {
-        console.log("aquiSDFFFFFFFFF");
+
         await schema.validate(data, {
           abortEarly: false
         });
@@ -205,6 +217,7 @@ const Pets = () => {
     formik.values.cor = "";
     formik.values.raca = "";
     formik.values.recommendations = "";
+    formik.values.doctorName = "";
     formik.values.sex = "";
     formik.values.birthday = new Date();
     setIsEdit(false);
@@ -215,12 +228,11 @@ const Pets = () => {
     return (date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear());
   }
 
-
   return (
     <Container maxWidth="xl" >
-      <SvgIcon style={{ fontSize: 50, color:green[900]  }} 
-      component={AddCircleIcon} 
-      onClick={handleModal}
+      <SvgIcon style={{ fontSize: 50, color: "blue" }}
+        component={AddCircleIcon}
+        onClick={handleModal}
       />
 
       <Modal
@@ -235,38 +247,42 @@ const Pets = () => {
           <Form onSubmit={(isEdit && handleChangeUpdate) || formik.handleSubmit} noValidate>
             <Form.Row>
               <Form.Group as={Col} controlId="name">
-                <Form.Label>Nome Pet: </Form.Label>
-                <Form.Control
+                <TextField
+                  fullWidth
                   required
+                  id="name"
                   name="name"
                   value={formik.values.name}
                   onChange={formik.handleChange}
-                  isInvalid={formik.touched.name && Boolean(formik.errors.name)}
+                  error={formik.touched.name && Boolean(formik.errors.name)}
+                  helperText={formik.touched.name && formik.errors.name}
+                  label="Nome: "
+                  className={classes.textField}
+                  variant="outlined"
                 />
-                <Form.Control.Feedback type="invalid" tooltip>
-                  {formik.errors.name}
-                </Form.Control.Feedback>
               </Form.Group>
             </Form.Row>
             <Form.Row>
               <Form.Group as={Col} controlId="doctorName">
-                <Form.Label>Nome Veterinário: </Form.Label>
-                <Form.Control
+                <TextField
+                  fullWidth
+                  id="doctorName"
                   name="doctorName"
                   value={formik.values.doctorName}
                   onChange={formik.handleChange}
-                  isInvalid={formik.touched.doctorName && !formik.errors.doctorName}
+                  error={formik.touched.doctorName && Boolean(formik.errors.doctorName)}
+                  helperText={formik.touched.doctorName && formik.errors.doctorName}
+                  label="Veterinario"
+                  className={classes.textField}
+                  variant="outlined"
                 />
-                <Form.Control.Feedback type="invalid" tooltip>
-                  {formik.errors.name}
-                </Form.Control.Feedback>
               </Form.Group>
             </Form.Row>
 
             <Form.Row>
-              <fieldset ref={switt}>
+              <fieldset style={{marginLeft: '20px'}}>
                 <Form.Group as={Row} controlId="sex">
-                  <Form.Label as="legend" column sm={3}>
+                  <Form.Label as="legend" column sm={4}>
                     Sexo
                   </Form.Label>
                   <Col sm={10}>
@@ -276,14 +292,17 @@ const Pets = () => {
                       name="sex"
                       value="Masculino"
                       onChange={formik.handleChange}
-                      isInvalid={!!formik.errors.sex}
+                      checked={"Masculino" === formik.values.sex}
+                      isInvalid={formik.touched.sex && Boolean(formik.errors.sex)}
                     />
                     <Form.Check
                       type="radio"
                       label="Feminino"
                       name="sex"
                       value="Feminino"
-                      isInvalid={formik.errors.sex}
+                      onChange={formik.handleChange}
+                      checked={"Feminino" === formik.values.sex}
+                      isInvalid={formik.touched.sex && Boolean(formik.errors.sex)}
                     />
                   </Col>
                   <Form.Control.Feedback type="invalid" tooltip>
@@ -293,55 +312,76 @@ const Pets = () => {
               </fieldset>
 
               <Form.Group as={Col} controlId="birthday">
-                <Form.Label>Data de Nascimento</Form.Label>
-                <Form.Control
+                <TextField
                   type="date"
                   name="birthday"
+                  label="Data de Nascimento"
+                  variant="outlined"
                   value={formik.values.birthday}
                   onChange={formik.handleChange}
-                  isInvalid={formik.touched.birthday && !formik.errors.birthday}
+                  error={formik.touched.birthday && Boolean(formik.errors.birthday)}
+                  helperText={formik.touched.birthday && formik.errors.birthday}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  
                 />
               </Form.Group>
             </Form.Row>
             <Form.Row>
               <Form.Group as={Col} controlId="cor">
-                <Form.Label>Cor Pet</Form.Label>
-                <Form.Control
-                  as="select"
+                <TextField
+                  fullWidth
+                  select
+                  id="cor"
                   name="cor"
+                  variant="outlined"
+                  label=" Cor do Pet"
+                  value={formik.values.cor}
+                  checked={  cores.find(cor => cor.name === formik.values.cor)}
                   onChange={formik.handleChange}
+                  className={classes.textField}
                   onBlur={formik.handleBlur}
-                  isInvalid={formik.touched.cor && !formik.errors.cor}
+                  error={formik.touched.cor && Boolean(formik.errors.cor)}
+                  helperText={formik.touched.cor && formik.errors.cor}
                 >
-                  <option value="defaul">-- Nenhum --</option>
+                  <option value="">-- Nenhum --</option>
                   {cores.map(cor => {
                     return (
                       <option key={cor.id} value={cor.cor}>{cor.cor}</option>)
                   })
                   }
-                </Form.Control>
+                </TextField>
               </Form.Group>
 
               <Form.Group as={Col} controlId="formGridEmail">
-                <Form.Label>Raça: </Form.Label>
-                <Form.Control
+                <TextField
+                  id="raca"
                   name="raca"
                   value={formik.values.raca}
                   onChange={formik.handleChange}
-                  isInvalid={formik.touched.raca && !formik.errors.raca}
+                  error={formik.touched.raca && Boolean(formik.errors.raca)}
+                  helperText={formik.touched.raca && formik.errors.raca}
+                  label="Veterinario"
+                  className={classes.textField}
+                  variant="outlined"
                 />
               </Form.Group>
             </Form.Row>
             <Form.Row>
               <Form.Group as={Col} controlId="id-description">
-                <Form.Label>Restrições/Observação</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
+                <TextField
+                  fullWidth
+                  multiline
+                  variant="outlined"
+                  rows={4}
+                  className={classes.textField}
                   name="recommendations"
+                  label="Recomendações"
                   value={formik.values.recommendations}
                   onChange={formik.handleChange}
-                  required
+                  error={formik.touched.raca && Boolean(formik.errors.raca)}
+                  helperText={formik.touched.raca && formik.errors.raca}
                 />
               </Form.Group>
             </Form.Row>
