@@ -30,7 +30,7 @@ const Header = () => {
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
-        {!token && locatinPath !== "/signin" ? (
+        {token ? (
           <Nav className="ml-auto">
             <Nav.Link id="menu-link" href="/dashboard">
               <FaHome style={{ marginRight: 5 }} />
@@ -56,9 +56,11 @@ const Header = () => {
               <FaSignOutAlt style={{ marginRight: 5 }} />
               Sair
             </Nav.Link>
-            : token ? <Nav.Link href="/addClient"></Nav.Link>
+            <Nav.Link href="/addClient"></Nav.Link>
           </Nav>
-        ) : null}
+        ) : (
+          locatinPath !== "/signin"
+        )}
       </Navbar.Collapse>
     </Navbar>
 

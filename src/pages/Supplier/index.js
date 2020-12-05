@@ -5,6 +5,7 @@ import {
   Col,
   Button,
   Row,
+  Card,
   Table,
   Container,
   Badge,
@@ -16,6 +17,7 @@ import { useFormik } from "formik";
 import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
 import { FaTrash, FaEdit } from "react-icons/fa";
+import { CpfMask } from "../../components/mask";
 
 const schema = yup.object().shape({
   name: yup.string().required("Insira a Razão Social do Forncedor"),
@@ -152,48 +154,52 @@ const Supplier = () => {
         </Button>
       </Col>
 
-      <Table style={{ marginTop: 25 }} striped bordered hover size="sm">
-        <thead>
-          <tr>
-            <th>Razão Social</th>
-            <th>Nome Fantasia</th>
-            <th>Telefone</th>
-            <th>CNPJ/CPF</th>
-            <th>Endereço</th>
-            <th>Ação</th>
-          </tr>
-        </thead>
-        <tbody>
-          {supliers.map((sup) => (
-            <tr>
-              <td>{sup.name}</td>
-              <td>{sup.companyName}</td>
-              <td>{sup.phone}</td>
-              <td>{sup.cpfCnpj}</td>
-              <td>{sup.address}</td>
-              <td>
-                <FaTrash
-                  id="fa-trash"
-                  color="red"
-                  onClick={(e) => handleDelete(sup.id)}
-                />
-                <FaEdit
-                  id="fa-edit"
-                  onClick={(e) =>
-                    loadUpdate(
-                      sup.id,
-                      sup.name,
-                      sup.companyName,
-                      sup.phone,
-                      sup.cpfCnpj
-                    )
-                  }
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <Row>
+        {supliers.map((sup) => (
+          <Col key={sup.id} sm={12} md={6} lg={4}>
+            <Card style={{ marginTop: 15 }} className="card-suplier">
+              <Card.Header
+                style={{ color: "#ffffff", background: "#e67e22" }}
+                as="h6"
+              >
+                {sup.name}
+              </Card.Header>
+              <Card.Body style={{ margin: 0 }}>
+                <p>
+                  <strong className="text-card">Razão Social:</strong>
+                  {sup.companyName}
+                  <FaEdit
+                    className="icon-card"
+                    style={{ color: "#DAA520", float: "right" }}
+                    onClick={(e) =>
+                      loadUpdate(
+                        sup.id,
+                        sup.name,
+                        sup.companyName,
+                        sup.phone,
+                        sup.cpfCnpj
+                      )
+                    }
+                  />
+                </p>
+                <p>
+                  <strong className="text-card">telefone:</strong> {sup.phone}
+                </p>
+                <p>
+                  <strong className="text-card">CPF/CNPJ:</strong>
+                  {sup.cpfCnpj}
+
+                  <FaTrash
+                    className="icon-card"
+                    style={{ float: "right", color: "crimson" }}
+                    onClick={(e) => handleDelete(sup.id)}
+                  />
+                </p>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
 
       <Modal
         show={show}
@@ -250,6 +256,7 @@ const Supplier = () => {
                   value={formik.values.phone}
                   onChange={formik.handleChange}
                   isValid={formik.touched.phone && !formik.errors.phone}
+                  pattern="\([0-9]{2}\)[0-9]{4,6}-[0-9]{3,4}$"
                 />
                 <Form.Control.Feedback type="invalid" tooltip>
                   {formik.errors.phone}
