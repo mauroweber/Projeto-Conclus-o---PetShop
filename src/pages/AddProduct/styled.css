@@ -8,7 +8,7 @@
 
 .btn-product {
   width: 130px;
-  float: right;
+  float: left;
 }
 
 .btn-open-cad {
@@ -26,5 +26,9 @@
 
 .icon-trash:hover {
   height: 20px;
+  cursor: pointer;
+}
+
+.add:hover {
   cursor: pointer;
 }

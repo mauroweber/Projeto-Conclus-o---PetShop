@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Col, Row, Form, Card, Button, Modal, Image } from "react-bootstrap";
 import api from "../../helpers/Api";
 
-import { FaTrashAlt, FaEdit } from "react-icons/fa";
+import { FaTrashAlt, FaEdit, FaPlusCircle, FaTrash } from "react-icons/fa";
 
 import "./styled.css";
 import { Formik } from "formik";
@@ -11,6 +11,7 @@ import { empty } from "uuidv4";
 function Product() {
   const [products, setProducts] = useState([]);
   const [show, setShow] = useState(false);
+  const [showCategory, setShowCategory] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("0");
   const [product, setProduct] = useState("");
@@ -20,13 +21,29 @@ function Product() {
   const [urlImg, setUrlImg] = useState("");
   const [edit, setEdit] = useState(false);
   const [idEdit, setIdEdit] = useState();
+  const [category, setCategory] = useState("");
+  const [quantity, setQuantity] = useState(0);
+  const [percentage, setPercentage] = useState(0);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const handleShowCategory = () => {
+    handleClose();
+    setShowCategory(true);
+  };
+  const handleCloseCategory = () => {
+    setShowCategory(false);
+    setCategory("");
+    handleShow();
+  };
 
   async function loadProducts() {
     const response = await api.get("product/findAll");
     setProducts(response.data);
+    const { price, porcentagemLucro } = response.data;
+
+    const total = (price / 100) * porcentagemLucro + price;
+    console.log(total);
   }
 
   async function loadCategory() {
@@ -40,7 +57,6 @@ function Product() {
   }
 
   const insertFile = async (id, file) => {
-    debugger;
     await api.put("product/insertImg/" + id, file).then((data) => {
       setUrlImg(data.data.url);
     });
@@ -54,16 +70,16 @@ function Product() {
       price,
       name: product,
       imgUrl: urlImg,
+      porcentagemLucro: percentage,
+      quantity,
     };
 
-    console.log(data);
     const file = new FormData();
     file.append("img", img);
 
     await api
       .post("product/insert", data)
       .then((response) => {
-        debugger;
         console.log(response.data);
         const result = response.data;
         setProducts([...products, result]);
@@ -120,6 +136,17 @@ function Product() {
     setProducts([...products.filter((p) => p.id !== id)]);
   }
 
+  async function addCategory(e) {
+    e.preventDefault();
+    const data = {
+      name: category,
+    };
+    await api.post("/category", data);
+    handleCloseCategory();
+    loadCategory();
+    handleShow();
+  }
+
   function handleOut() {
     setEdit(false);
     setProduct("");
@@ -145,7 +172,7 @@ function Product() {
       </Col>
 
       <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>
             {edit ? "Editar Produto" : "Adicionar Produto"}
           </Modal.Title>
@@ -190,7 +217,13 @@ function Product() {
             <Form.Group>
               <Row>
                 <Col>
-                  <Form.Label>Categoria</Form.Label>
+                  <Form.Label>
+                    Categoria{" "}
+                    <FaPlusCircle
+                      onClick={handleShowCategory}
+                      className="add"
+                    />
+                  </Form.Label>
                   <Form.Control
                     as="select"
                     value={selectedCategory}
@@ -204,27 +237,89 @@ function Product() {
                     ))}
                   </Form.Control>
                 </Col>
+              </Row>
+            </Form.Group>
+
+            <Form.Group>
+              <Row>
                 <Col>
-                  <Form.Label>Preço</Form.Label>
+                  <Form.Label>Quantidade</Form.Label>
                   <Form.Control
-                    type=""
+                    name="quantity"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    required
+                  ></Form.Control>
+                </Col>
+                <Col>
+                  <Form.Label>Valor unitário</Form.Label>
+                  <Form.Control
                     name="price"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    placeholder="Preço do Produto"
                     required
                   ></Form.Control>
                 </Col>
               </Row>
             </Form.Group>
+            <Form.Group>
+              <Row>
+                <Col md={6}>
+                  <Form.Label>Percentual de lucro</Form.Label>
+                  <Form.Control
+                    name="percentage"
+                    value={percentage}
+                    onChange={(e) => setPercentage(e.target.value)}
+                    required
+                  ></Form.Control>
+                </Col>
+              </Row>
+            </Form.Group>
+
             <Button type="submit" className="btn-product" variant="dark">
               {edit ? "EDITAR" : "CADASTRAR"}
             </Button>
-            <Button variant="danger" onClick={handleOut}>
+            <Button
+              variant="danger"
+              onClick={handleOut}
+              style={{ float: "right" }}
+            >
               Sair
             </Button>
           </Form>
         </Modal.Body>
+      </Modal>
+      <Modal show={showCategory} onHide={handleCloseCategory}>
+        <Modal.Header>
+          <Modal.Title>Cadastrar Categotia</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={addCategory}>
+          <Row>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Control
+                  style={{ marginLeft: 10 }}
+                  type="text"
+                  name="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="Categoria"
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Button type="submit">Adicionar</Button>
+              <Button
+                variant="danger"
+                style={{ marginLeft: 2 }}
+                onClick={handleCloseCategory}
+              >
+                Sair
+              </Button>
+            </Col>
+          </Row>
+        </Form>
       </Modal>
       <Row>
         {products.map((product) => (
@@ -242,8 +337,15 @@ function Product() {
                 <Card.Title>{product.name}</Card.Title>
                 <Card.Text>{product.description}</Card.Text>
                 <p>
-                  Preço: <strong>{product.price}R$</strong>
+                  Quantidade: <strong>{product.quantity}</strong>
                 </p>
+                <p>
+                  Valor unitário: <strong>R$: {product.price}</strong>
+                </p>
+                <p>
+                  Valor de Venda: <strong></strong>
+                </p>
+
                 <FaEdit onClick={(e) => loadUpdate(product)}></FaEdit>
                 <FaTrashAlt
                   onClick={(e) => handleDeleteProduct(product.id)}
