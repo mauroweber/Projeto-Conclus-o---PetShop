@@ -90,9 +90,11 @@ const Pets = () => {
           <Form.Group as={Col} controlId="name" >
             <TextField
               fullWidth
+              required
               id="name"
               name="name"
               label="Nome"
+              variant="outlined"
               value={formik.values.name}
               onChange={formik.handleChange}
               error={formik.touched.name && Boolean(formik.errors.name)}
@@ -104,10 +106,12 @@ const Pets = () => {
           <Form.Group as={Col} controlId="email">
             <TextField
               fullWidth
+              required
               id="email"
               name="email"
               label="E-mail"
               type="email"
+              variant="outlined"
               value={formik.values.email}
               onChange={formik.handleChange}
               error={formik.touched.email && Boolean(formik.errors.email)}
@@ -119,10 +123,12 @@ const Pets = () => {
           <Form.Group as={Col} controlId="password">
             <TextField
               fullWidth
+              required
               id="password"
               name="password"
               label="Senha "
               type="password"
+              variant="outlined"
               value={formik.values.password}
               onChange={formik.handleChange}
               error={formik.touched.password && Boolean(formik.errors.password)}
@@ -133,10 +139,12 @@ const Pets = () => {
           <Form.Group as={Col} controlId="passwordCheck">
             <TextField
               fullWidth
+              required
               id="passwordCheck"
               name="passwordCheck"
               type="password"
               label="Confirme a Senha"
+              variant="outlined"
               value={formik.values.passwordCheck}
               onChange={formik.handleChange}
               error={formik.touched.passwordCheck && Boolean(formik.errors.passwordCheck)}
