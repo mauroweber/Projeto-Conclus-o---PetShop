@@ -28,6 +28,7 @@ const Header = () => {
       <Navbar.Brand href="#home">
         <img style={{ height: 48 }} src={dog} alt="PetsCare" />
       </Navbar.Brand>
+      <h3>Pet's Care</h3>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         {token ? (

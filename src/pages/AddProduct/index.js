@@ -1,12 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Col, Row, Form, Card, Button, Modal, Image } from "react-bootstrap";
 import api from "../../helpers/Api";
 
-import { FaTrashAlt, FaEdit, FaPlusCircle, FaTrash } from "react-icons/fa";
+import { FaTrashAlt, FaEdit, FaPlusCircle } from "react-icons/fa";
 
 import "./styled.css";
-import { Formik } from "formik";
-import { empty } from "uuidv4";
 
 function Product() {
   const [products, setProducts] = useState([]);
@@ -37,13 +35,20 @@ function Product() {
     handleShow();
   };
 
+  function cleanFields() {
+    setProduct("");
+    setDescription("");
+    setPrice("");
+    setCategory("");
+    setQuantity("");
+    setPercentage("");
+    setSelectedCategory("");
+  }
+
   async function loadProducts() {
     const response = await api.get("product/findAll");
-    setProducts(response.data);
-    const { price, porcentagemLucro } = response.data;
 
-    const total = (price / 100) * porcentagemLucro + price;
-    console.log(total);
+    setProducts(response.data);
   }
 
   async function loadCategory() {
@@ -80,7 +85,6 @@ function Product() {
     await api
       .post("product/insert", data)
       .then((response) => {
-        console.log(response.data);
         const result = response.data;
         setProducts([...products, result]);
         if (result.id != null) {
@@ -90,19 +94,28 @@ function Product() {
       .catch((error) => {
         console.log(error);
       });
-
+    cleanFields();
     handleClose();
     loadProducts();
   }
 
   function loadUpdate(product) {
-    const { price, description, name, id } = product;
+    const {
+      quantity,
+      porcentagemLucro,
+      price,
+      description,
+      name,
+      id,
+    } = product;
     setPrice(price);
     setDescription(description);
     setProduct(name);
     handleShow();
     setEdit(true);
     setIdEdit(id);
+    setQuantity(quantity);
+    setPercentage(porcentagemLucro);
   }
 
   async function handleUpdate(e) {
@@ -125,10 +138,7 @@ function Product() {
     setShow(false);
     loadProducts();
 
-    setProduct("");
-    setPrice("");
-    setDescription("");
-    setImg("");
+    cleanFields();
   }
 
   async function handleDeleteProduct(id) {
@@ -340,10 +350,28 @@ function Product() {
                   Quantidade: <strong>{product.quantity}</strong>
                 </p>
                 <p>
-                  Valor unitário: <strong>R$: {product.price}</strong>
+                  Valor unitário <strong>R$: {product.price}</strong>
                 </p>
                 <p>
-                  Valor de Venda: <strong></strong>
+                  Valor de Venda
+                  <strong>
+                    R$:{" "}
+                    {(
+                      product.price *
+                      ("1." + product.porcentagemLucro)
+                    ).toFixed(2)}
+                  </strong>
+                </p>
+                <p>
+                  Valor total de Estoque{" "}
+                  <strong>
+                    R$:{" "}
+                    {product.quantity *
+                      (
+                        product.price *
+                        ("1." + product.porcentagemLucro)
+                      ).toFixed(2)}{" "}
+                  </strong>
                 </p>
 
                 <FaEdit onClick={(e) => loadUpdate(product)}></FaEdit>
