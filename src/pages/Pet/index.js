@@ -87,7 +87,7 @@ const Pets = () => {
       } catch (e) {
         console.log('errou')
       }
-    }, [pet, edit]),
+    }, [pet, edit, show, pets]),
 
   });
 
@@ -123,6 +123,7 @@ const Pets = () => {
         })
         setPets([...pets, response.data])
         handleModal();
+        setField(initialValues);
         setPet({});
         setEdit(false);
       }).catch((error) => {
@@ -155,6 +156,7 @@ const Pets = () => {
       .then((response) => {
         handleModal();
         setEdit(false);
+        setField(initialValues);
         setPets([...pets.map(p => {
           if (pet.id === p.id) {
             p = response.data;
@@ -182,7 +184,7 @@ const Pets = () => {
   };
 
   const setField = (obj) => {
-    const fields = ['name', 'doctorName', 'birthday', 'sex', 'color'];
+    const fields = ['name', 'doctorName', 'birthday', 'sex', 'color', 'raca'];
     fields.forEach(field => formik.setFieldValue(field, obj[field], false));
     if (obj.recommendations.length > 0) {
       formik.setFieldValue('recommendations', obj.recommendations[0].name, false);
