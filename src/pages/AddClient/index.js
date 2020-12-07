@@ -1,7 +1,8 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 //import CepApi from '../../helpers/CepApi';
-import { Container } from './styled';
+// import { Container } from './styled';
 import { Select, MenuItem, TextField, Button } from "@material-ui/core";
+import { Form, Container, Row, Col, ListGroup } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import api from "../../helpers/Api";
@@ -16,134 +17,155 @@ const initialValues = {
   street: "",
   number: "",
   cpfCnpj: "",
-  complement: ""
-
-}
+  complement: "",
+};
 
 const schema = Yup.object().shape({
-
-  name: Yup
-    .string()
-    .required("Nome Obrigratorio"),
-  email: Yup
-    .string()
+  name: Yup.string().required("Nome Obrigratorio"),
+  email: Yup.string()
     .required("Email requerido ")
     .email("Digite um Email Válido"),
-  phone: Yup
-    .string()
-    .required("Número para contato reuqerido"),
-  cpfCnpj: Yup
-    .string()
-    .required("Cpf Requerido"),
-
+  phone: Yup.string().required("Número para contato reuqerido"),
+  cpfCnpj: Yup.string().required("Cpf Requerido"),
 });
 
-
 const Page = () => {
+  const [clients, setClients] = useState([]);
   const { addToast } = useToast();
 
+  async function loadClients() {
+    const response = await api.get("/user/findAll");
+
+    setClients(response.data);
+    console.log(response.data);
+  }
+  useEffect(() => {
+    loadClients();
+  }, []);
 
   const formik = useFormik({
     initialValues: initialValues,
 
     validationSchema: schema,
 
-
-    onSubmit: useCallback(async (values) => {
-      try {
-
-        await schema.validate(values, {
-          abortEarly: false
-        })
-
-        var parameter = {
-          name: values.name,
-          email: values.email,
-          phone: values.phone,
-          cpfCnpj: values.cpfCnpj
-        }
-        await api.post("/user", parameter)
-          .then(response => {
-            addToast({
-              type: 'success',
-              title: "Usuario cadastrado com Sucesso"
-            });
-          }).catch(error =>{debugger
-            console.log(error);
-          })
-
-
-      } catch (error) {
-        if (error instanceof Yup.ValidationError) {
-          const erros = getValidationError(error);
-          erros.forEach(err => {
-            addToast({
-              type: 'error',
-              title: "Erro Autenticação da Pagina",
-              description: err
-            });
+    onSubmit: useCallback(
+      async (values) => {
+        try {
+          await schema.validate(values, {
+            abortEarly: false,
           });
-          error.erros.map((e) => {
-            addToast({
-              type: 'error',
-              title: "Erro Autenticação da Pagina",
-              description: e
+
+          var parameter = {
+            name: values.name,
+            email: values.email,
+            phone: values.phone,
+            cpfCnpj: values.cpfCnpj,
+          };
+          await api
+            .post("/user", parameter)
+            .then((response) => {
+              addToast({
+                type: "success",
+                title: "Usuario cadastrado com Sucesso",
+              });
+            })
+            .catch((error) => {
+              debugger;
+              console.log(error);
             });
+        } catch (error) {
+          if (error instanceof Yup.ValidationError) {
+            const erros = getValidationError(error);
+            erros.forEach((err) => {
+              addToast({
+                type: "error",
+                title: "Erro Autenticação da Pagina",
+                description: err,
+              });
+            });
+            error.erros.map((e) => {
+              addToast({
+                type: "error",
+                title: "Erro Autenticação da Pagina",
+                description: e,
+              });
+            });
+            return;
+          }
+
+          addToast({
+            type: "error",
+            title: "Erro Autenticação da Pagina",
+            description: "Erro inesperado",
           });
-          return;
         }
+      },
+      [addToast]
+    ),
 
-        addToast({
-          type: 'error',
-          title: "Erro Autenticação da Pagina",
-          description: "Erro inesperado"
-        });
-
-
-      };
-    }, [addToast]),
-
-    onReset: initialValues
-
+    onReset: initialValues,
   });
 
   return (
     <Container>
-      <form onReset={formik.handleReset} onSubmit={formik.handleSubmit} noValidate>
+      <form
+        onReset={formik.handleReset}
+        onSubmit={formik.handleSubmit}
+        noValidate
+      >
         <h1>Dados Cadastrais </h1>
         <hr />
-        <TextField
-          fullWidth
-          id="name"
-          name="name"
-          label="Nome"
-          value={formik.values.name}
-          onChange={formik.handleChange}
-          error={formik.touched.name && Boolean(formik.errors.name)}
-          helperText={formik.touched.name && formik.errors.name}
-        />
+        <Form.Group>
+          <Row>
+            <Col>
+              <Form.Label>Nome:</Form.Label>
+              <Form.Control
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Nome completo"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                error={formik.touched.name && Boolean(formik.errors.name)}
+                helperText={formik.touched.name && formik.errors.name}
+              />
+            </Col>
+          </Row>
+        </Form.Group>
 
-        <TextField
-          fullWidth
-          id="email"
-          name="email"
-          label="E-mail"
-          value={formik.values.email}
-          onChange={formik.handleChange}
-          error={formik.touched.email && Boolean(formik.errors.email)}
-          helperText={formik.touched.email && formik.errors.email}
-        />
+        <Form.Group>
+          <Row>
+            <Col>
+              <Form.Group>
+                <Form.Label>E-mail:</Form.Label>
+                <Form.Control
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Seu melhor e-mail"
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                  helperText={formik.touched.email && formik.errors.email}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Label>Telefone:</Form.Label>
+              <Form.Control
+                type="text"
+                id="phone"
+                name="phone"
+                placeholder="Telefone ou celular"
+                value={formik.values.phone}
+                onChange={formik.handleChange}
+                error={formik.touched.phone && Boolean(formik.errors.phone)}
+                helperText={formik.touched.phone && formik.errors.phone}
+              />
+            </Col>
+          </Row>
+        </Form.Group>
 
-        <TextField
-          fullWidth
-          id="phone"
-          name="phone"
-          label="Telefone Celular"
-          value={formik.values.phone}
-          onChange={formik.handleChange}
-          error={formik.touched.phone && Boolean(formik.errors.phone)}
-          helperText={formik.touched.phone && formik.errors.phone}
-        />
         <TextField
           fullWidth
           id="cpfCnpj"
@@ -179,16 +201,34 @@ const Page = () => {
           onChange={formik.handleChange}
         />
 
-
         <Button color="secondary" variant="contained" fullWidth type="submit">
           Cadastrar Cliente
         </Button>
-
-
       </form>
+      <Row>
+        <Col md={12}>
+          {clients.map((client) => (
+            <ListGroup horizontal key={client.id}>
+              <ListGroup.Item>
+                <strong>NOME: </strong> {client.name}
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <strong>E-MAIL: </strong>
+                {client.email}
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <strong>TELEFONE: </strong> {client.phone}
+              </ListGroup.Item>
+              <ListGroup.Item>and above!</ListGroup.Item>
+            </ListGroup>
+          ))}
+        </Col>
+      </Row>
+      <Row>
+        <Col></Col>
+      </Row>
     </Container>
   );
 };
 
 export default Page;
-

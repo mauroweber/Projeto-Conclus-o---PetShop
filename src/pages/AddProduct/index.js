@@ -2,13 +2,16 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Col, Row, Form, Card, Button, Modal, Image } from "react-bootstrap";
 import api from "../../helpers/Api";
 
-import { FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt, FaEdit, FaPlusCircle, FaTrash } from "react-icons/fa";
 
-import  "./style.css";
+import "./styled.css";
+import { Formik } from "formik";
+import { empty } from "uuidv4";
 
 function Product() {
   const [products, setProducts] = useState([]);
   const [show, setShow] = useState(false);
+  const [showCategory, setShowCategory] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("0");
   const [product, setProduct] = useState("");
@@ -16,14 +19,31 @@ function Product() {
   const [img, setImg] = useState();
   const [price, setPrice] = useState(0);
   const [urlImg, setUrlImg] = useState("");
+  const [edit, setEdit] = useState(false);
+  const [idEdit, setIdEdit] = useState();
+  const [category, setCategory] = useState("");
+  const [quantity, setQuantity] = useState(0);
+  const [percentage, setPercentage] = useState(0);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const handleShowCategory = () => {
+    handleClose();
+    setShowCategory(true);
+  };
+  const handleCloseCategory = () => {
+    setShowCategory(false);
+    setCategory("");
+    handleShow();
+  };
 
   async function loadProducts() {
     const response = await api.get("product/findAll");
     setProducts(response.data);
+    const { price, porcentagemLucro } = response.data;
 
+    const total = (price / 100) * porcentagemLucro + price;
+    console.log(total);
   }
 
   async function loadCategory() {
@@ -37,12 +57,10 @@ function Product() {
   }
 
   const insertFile = async (id, file) => {
-    debugger
-    await api.put("product/insertImg/" + id, file)
-      .then(data => {
-        setUrlImg(data.data.url);
-      })
-  }
+    await api.put("product/insertImg/" + id, file).then((data) => {
+      setUrlImg(data.data.url);
+    });
+  };
 
   async function handleAddPRoduct(e) {
     e.preventDefault();
@@ -52,35 +70,89 @@ function Product() {
       price,
       name: product,
       imgUrl: urlImg,
+      porcentagemLucro: percentage,
+      quantity,
     };
 
-    console.log(data);
     const file = new FormData();
     file.append("img", img);
 
-
-    await api.post("product/insert", data)
-      .then(response => {
+    await api
+      .post("product/insert", data)
+      .then((response) => {
         console.log(response.data);
         const result = response.data;
         setProducts([...products, result]);
         if (result.id != null) {
           insertFile(result.id, file);
         }
-      }).catch(error => {
+      })
+      .catch((error) => {
         console.log(error);
       });
 
-
-
-
     handleClose();
     loadProducts();
-  };
+  }
+
+  function loadUpdate(product) {
+    const { price, description, name, id } = product;
+    setPrice(price);
+    setDescription(description);
+    setProduct(name);
+    handleShow();
+    setEdit(true);
+    setIdEdit(id);
+  }
+
+  async function handleUpdate(e) {
+    e.preventDefault();
+    setPrice(price);
+    setDescription(description);
+    setProduct(product);
+    setImg(urlImg);
+
+    const data = {
+      price,
+      description,
+      product,
+      urlImg,
+    };
+
+    await api.put(`product/${idEdit}`, data);
+
+    setEdit(false);
+    setShow(false);
+    loadProducts();
+
+    setProduct("");
+    setPrice("");
+    setDescription("");
+    setImg("");
+  }
 
   async function handleDeleteProduct(id) {
     await api.delete(`product/${id}`);
-    setProducts([...products.filter(p => p.id !== id)]);
+    setProducts([...products.filter((p) => p.id !== id)]);
+  }
+
+  async function addCategory(e) {
+    e.preventDefault();
+    const data = {
+      name: category,
+    };
+    await api.post("/category", data);
+    handleCloseCategory();
+    loadCategory();
+    handleShow();
+  }
+
+  function handleOut() {
+    setEdit(false);
+    setProduct("");
+    setPrice("");
+    setDescription("");
+    setShow(false);
   }
 
   useEffect(() => {
@@ -92,123 +164,199 @@ function Product() {
   }, []);
 
   return (
-
-
-
-
-      <Col>
-        <Col style={{ textAlign: "center", marginTop: 20 }}>
-          <Button className="btn-open-cad" variant="dark" onClick={handleShow}>
-            Cadastrar produto
+    <Col>
+      <Col style={{ textAlign: "center", marginTop: 20 }}>
+        <Button className="btn-open-cad" variant="dark" onClick={handleShow}>
+          Cadastrar produto
         </Button>
-        </Col>
-
-        <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Adicionar Produto</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form
-              onSubmit={handleAddPRoduct}
-              className="form-container"
-              encType="multipart/form-data"
-            >
-              <Form.Group >
-                <Form.Label>Produto</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="product"
-                  value={product}
-                  onChange={(e) => setProduct(e.target.value)}
-                  placeholder="Nome do Produto"
-                  required
-                />
-              </Form.Group>
-              <Form.Group>
-                <Form.File
-                  id="img-upload"
-                  label="Insira a imagem do produto"
-                  accept="image/x-png,image/gif,image/jpeg"
-                  onChange={(e) => setImg(e.target.files[0])}
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="id-description">
-                <Form.Label>Descrição</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  name="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  required
-                />
-              </Form.Group>
-              <Form.Group>
-                <Row>
-                  <Col>
-                    <Form.Label>Categoria</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={selectedCategory}
-                      onChange={handleSelectedCategory}
-                    >
-                      <option>Escolha uma categoria</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </Form.Control>
-                  </Col>
-                  <Col>
-                    <Form.Label>Preço</Form.Label>
-                    <Form.Control
-                      type=""
-                      name="price"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      placeholder="Preço do Produto"
-                      required
-                    ></Form.Control>
-                  </Col>
-                </Row>
-              </Form.Group>
-              <Button type="submit" className="btn-product" variant="dark">
-                Cadastrar
-            </Button>
-            </Form>
-          </Modal.Body>
-        </Modal>
-        <Row>
-          {products.map((product) => (
-            <Col key={product.id} sm={12} md={6} lg={4} style={{ marginTop: 50 }}>
-              <Card>
-                <Card.Img
-                  className="img-pet"
-                  variant="top"
-                  as={Image}
-                  src={product.imgUrl}
-                  fluid={true}
-                  alt={product.name}
-                />
-                <Card.Body>
-                  <Card.Title>{product.name}</Card.Title>
-                  <Card.Text>{product.description}</Card.Text>
-                  <p>
-                    Preço: <strong>{product.price}R$</strong>
-                  </p>
-                  <FaTrashAlt
-                    onClick={(e) => handleDeleteProduct(product.id)}
-                    className="icon-trash"
-                  />
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
       </Col>
 
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header>
+          <Modal.Title>
+            {edit ? "Editar Produto" : "Adicionar Produto"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form
+            onSubmit={edit ? handleUpdate : handleAddPRoduct}
+            className="form-container"
+            encType="multipart/form-data"
+          >
+            <Form.Group>
+              <Form.Label>Produto</Form.Label>
+              <Form.Control
+                type="text"
+                name="product"
+                value={product}
+                onChange={(e) => setProduct(e.target.value)}
+                placeholder="Nome do Produto"
+                required
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.File
+                id="img-upload"
+                label="Insira a imagem do produto"
+                accept="image/x-png,image/gif,image/jpeg"
+                onChange={(e) => setImg(e.target.files[0])}
+                required
+              />
+            </Form.Group>
+            <Form.Group controlId="id-description">
+              <Form.Label>Descrição</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                name="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group>
+              <Row>
+                <Col>
+                  <Form.Label>
+                    Categoria{" "}
+                    <FaPlusCircle
+                      onClick={handleShowCategory}
+                      className="add"
+                    />
+                  </Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={selectedCategory}
+                    onChange={handleSelectedCategory}
+                  >
+                    <option>Escolha uma categoria</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Col>
+              </Row>
+            </Form.Group>
+
+            <Form.Group>
+              <Row>
+                <Col>
+                  <Form.Label>Quantidade</Form.Label>
+                  <Form.Control
+                    name="quantity"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    required
+                  ></Form.Control>
+                </Col>
+                <Col>
+                  <Form.Label>Valor unitário</Form.Label>
+                  <Form.Control
+                    name="price"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    required
+                  ></Form.Control>
+                </Col>
+              </Row>
+            </Form.Group>
+            <Form.Group>
+              <Row>
+                <Col md={6}>
+                  <Form.Label>Percentual de lucro</Form.Label>
+                  <Form.Control
+                    name="percentage"
+                    value={percentage}
+                    onChange={(e) => setPercentage(e.target.value)}
+                    required
+                  ></Form.Control>
+                </Col>
+              </Row>
+            </Form.Group>
+
+            <Button type="submit" className="btn-product" variant="dark">
+              {edit ? "EDITAR" : "CADASTRAR"}
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleOut}
+              style={{ float: "right" }}
+            >
+              Sair
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+      <Modal show={showCategory} onHide={handleCloseCategory}>
+        <Modal.Header>
+          <Modal.Title>Cadastrar Categotia</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={addCategory}>
+          <Row>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Control
+                  style={{ marginLeft: 10 }}
+                  type="text"
+                  name="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="Categoria"
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Button type="submit">Adicionar</Button>
+              <Button
+                variant="danger"
+                style={{ marginLeft: 2 }}
+                onClick={handleCloseCategory}
+              >
+                Sair
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+      <Row>
+        {products.map((product) => (
+          <Col key={product.id} sm={12} md={6} lg={3} style={{ marginTop: 50 }}>
+            <Card>
+              <Card.Img
+                className="img-pet"
+                variant="top"
+                as={Image}
+                src={product.imgUrl}
+                fluid={true}
+                alt={product.name}
+              />
+              <Card.Body>
+                <Card.Title>{product.name}</Card.Title>
+                <Card.Text>{product.description}</Card.Text>
+                <p>
+                  Quantidade: <strong>{product.quantity}</strong>
+                </p>
+                <p>
+                  Valor unitário: <strong>R$: {product.price}</strong>
+                </p>
+                <p>
+                  Valor de Venda: <strong></strong>
+                </p>
+
+                <FaEdit onClick={(e) => loadUpdate(product)}></FaEdit>
+                <FaTrashAlt
+                  onClick={(e) => handleDeleteProduct(product.id)}
+                  className="icon-trash"
+                />
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Col>
   );
 }
 

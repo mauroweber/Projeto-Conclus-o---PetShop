@@ -1,4 +1,3 @@
-
 * {
   color: #1d1d1d;
 }
@@ -9,7 +8,7 @@
 
 .btn-product {
   width: 130px;
-  float: right;
+  float: left;
 }
 
 .btn-open-cad {
@@ -17,18 +16,19 @@
 }
 
 .img-pet {
-  height: 400px;
   width: 100%;
-  
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  background: #eee;
+  height: 200px;
 }
 
 .icon-trash {
-  color: crimson;
   float: right;
 }
 
 .icon-trash:hover {
-  height: 48px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.add:hover {
+  cursor: pointer;
 }

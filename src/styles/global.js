@@ -1,4 +1,4 @@
-import styled, { createGlobalStyle} from 'styled-components';
+import styled, { createGlobalStyle } from "styled-components";
 // colocar CREATE antyes da criação do stylo;
 export default createGlobalStyle`
   * {
@@ -6,6 +6,7 @@ export default createGlobalStyle`
     padding: 0;
     outline: 0;
     box-sizing: border-box;
+
   }
 
   body{
@@ -33,10 +34,7 @@ export default createGlobalStyle`
 `;
 
 export const PageBody = styled.div`
-
-display: flex;
-flex-direction: row;
-height: calc(100vh - 145px);
-
-
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 145px);
 `;
