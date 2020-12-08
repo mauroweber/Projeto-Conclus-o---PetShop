@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { FaSearchLocation } from "react-icons/fa";
 import CepApi from "../../helpers/CepApi";
 import InputMask from "react-input-mask";
 // import { Container } from './styled';
@@ -18,6 +19,7 @@ import api from "../../helpers/Api";
 
 import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
+import { complement } from "polished";
 
 const initialValues = {
   name: "",
@@ -27,6 +29,10 @@ const initialValues = {
   number: "",
   cpfCnpj: "",
   complement: "",
+  state: "",
+  city: "",
+  neighborhood: "",
+  cep: "",
 };
 
 const schema = Yup.object().shape({
@@ -41,6 +47,7 @@ const schema = Yup.object().shape({
 const Page = () => {
   const [clients, setClients] = useState([]);
   const { addToast } = useToast();
+  const [cep, setCep] = useState("");
 
   async function loadClients() {
     const response = await api.get("/user/findAll");
@@ -51,6 +58,19 @@ const Page = () => {
   useEffect(() => {
     loadClients();
   }, []);
+
+  async function loadCep(cep) {
+    const response = await CepApi.get(`${cep}/json`);
+    const { logradouro, complemento, bairro, localidade, uf } = response.data;
+    formik.values.complement = complemento;
+    formik.values.street = logradouro;
+    formik.values.neighborhood = bairro;
+    formik.values.city = localidade;
+    formik.values.state = uf;
+  }
+  useEffect(() => {
+    loadCep(cep);
+  }, [cep]);
 
   const formik = useFormik({
     initialValues: initialValues,
@@ -69,6 +89,15 @@ const Page = () => {
             email: values.email,
             phone: values.phone,
             cpfCnpj: values.cpfCnpj,
+            address: {
+              street: values.street,
+              complement: values.complement,
+              number: values.number,
+              nmCity: values.city,
+              nmState: values.state,
+              neighborhood: values.neighborhood,
+              cep: values.cep,
+            },
           };
           await api
             .post("/user", parameter)
@@ -202,10 +231,11 @@ const Page = () => {
                   id="cep"
                   name="cep"
                   label="CEP"
-                  value={formik.values.cep}
-                  onChange={formik.handleChange}
+                  value={cep}
+                  onChange={(e) => setCep(e.target.value)}
                 />
               </Col>
+
               <Col>
                 <Form.Label>Rua:</Form.Label>
                 <Form.Control
@@ -221,40 +251,37 @@ const Page = () => {
               <Col>
                 <Form.Label>Número:</Form.Label>
                 <Form.Control
-                  id="complement"
-                  name="complement"
-                  label="Complemento"
-                  value={formik.values.complement}
+                  id="number"
+                  name="number"
+                  label="number"
+                  value={formik.values.number}
                   onChange={formik.handleChange}
                 />
               </Col>
               <Col>
                 <Form.Label>Bairro:</Form.Label>
                 <Form.Control
-                  id="complement"
-                  name="complement"
-                  label="Complemento"
-                  value={formik.values.complement}
+                  id="neighborhood"
+                  name="neighborhood"
+                  value={formik.values.neighborhood}
                   onChange={formik.handleChange}
                 />
               </Col>
               <Col>
                 <Form.Label>Cidade:</Form.Label>
                 <Form.Control
-                  id="complement"
-                  name="complement"
-                  label="Complemento"
-                  value={formik.values.complement}
+                  id="city"
+                  name="city"
+                  value={formik.values.city}
                   onChange={formik.handleChange}
                 />
               </Col>
               <Col>
                 <Form.Label>Estado:</Form.Label>
                 <Form.Control
-                  id="complement"
-                  name="complement"
-                  label="Complemento"
-                  value={formik.values.complement}
+                  id="state"
+                  name="state"
+                  value={formik.values.state}
                   onChange={formik.handleChange}
                 />
               </Col>

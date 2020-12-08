@@ -23,6 +23,8 @@ function Product() {
   const [quantity, setQuantity] = useState(0);
   const [percentage, setPercentage] = useState(0);
 
+  const token = localStorage.getItem("@PetsCare:token");
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const handleShowCategory = () => {
@@ -47,7 +49,7 @@ function Product() {
 
   async function loadProducts() {
     const response = await api.get("product/findAll");
-
+    console.log(token);
     setProducts(response.data);
   }
 
@@ -128,8 +130,10 @@ function Product() {
     const data = {
       price,
       description,
-      product,
+      name: product,
       urlImg,
+      porcentagemLucro: percentage,
+      quantity,
     };
 
     await api.put(`product/${idEdit}`, data);
@@ -358,7 +362,7 @@ function Product() {
                     R$:{" "}
                     {(
                       product.price *
-                      ("1." + product.porcentagemLucro)
+                      (1 + product.porcentagemLucro / 100)
                     ).toFixed(2)}
                   </strong>
                 </p>
@@ -369,7 +373,7 @@ function Product() {
                     {product.quantity *
                       (
                         product.price *
-                        ("1." + product.porcentagemLucro)
+                        (1 + product.porcentagemLucro / 100)
                       ).toFixed(2)}{" "}
                   </strong>
                 </p>
