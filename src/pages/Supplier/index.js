@@ -278,20 +278,6 @@ const Supplier = () => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Form.Row>
-            <Form.Row>
-              <Form.Group as={Col} controlId="address">
-                <Form.Label>Endereço: </Form.Label>
-                <Form.Control
-                  name="address"
-                  value={formik.values.address}
-                  onChange={formik.handleChange}
-                  isValid={formik.touched.address && !formik.errors.address}
-                />
-                <Form.Control.Feedback type="invalid" tooltip>
-                  {formik.errors.address}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Form.Row>
             <div>
               <Button type="submit" variant="success" size="lg">
                 {(edit && "Editar Fornecedor") || "Cadastrar Fornecedor"}

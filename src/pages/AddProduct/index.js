@@ -83,15 +83,15 @@ function Product() {
 
     const file = new FormData();
     file.append("img", img);
-
+  
     await api
       .post("product/insert", data)
       .then((response) => {
         const result = response.data;
-        setProducts([...products, result]);
         if (result.id != null) {
           insertFile(result.id, file);
         }
+        setProducts([...products, result]);
       })
       .catch((error) => {
         console.log(error);
@@ -126,6 +126,8 @@ function Product() {
     setDescription(description);
     setProduct(product);
     setImg(urlImg);
+    const file = new FormData();
+    file.append("img", img);
 
     const data = {
       price,
@@ -136,7 +138,12 @@ function Product() {
       quantity,
     };
 
-    await api.put(`product/${idEdit}`, data);
+    await api.put(`product/${idEdit}`, data).then((response) =>{
+      const result = response.data;
+      if (result.id != null) {
+        insertFile(result.id, file);
+      }
+    });
 
     setEdit(false);
     setShow(false);

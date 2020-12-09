@@ -126,8 +126,7 @@ const Pets = () => {
       color: data.color,
       sex: data.sex,
       raca: data.raca,
-      recommendations: [{ name: data.recommendations }],
-      user: data.user
+      recommendations: [{ name: data.recommendations }]
     }
 
     await Api.post('/pets', parameter)
