@@ -1,14 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  FaMapMarkedAlt,
-  FaMapMarkerAlt,
-  FaEdit,
-  FaTrash,
-} from "react-icons/fa";
+import { FaMapMarkerAlt, FaEdit, FaTrash } from "react-icons/fa";
 import CepApi from "../../helpers/CepApi";
-import InputMask from "react-input-mask";
-// import { Container } from './styled';
-
 import {
   Form,
   Container,
@@ -19,60 +11,35 @@ import {
   Table,
   Modal,
 } from "react-bootstrap";
-import { useFormik } from "formik";
-import * as Yup from "yup";
 import api from "../../helpers/Api";
 
-import getValidationError from "../../utils/getValidationError";
-import { useToast } from "../../hooks/toast";
-
-const initialValues = {
-  name: "",
-  email: "",
-  phone: "",
-  street: "",
-  number: "",
-  cpfCnpj: "",
-  complement: "",
-  state: "",
-  city: "",
-  neighborhood: "",
-  cep: "",
-};
-
-const schema = Yup.object().shape({
-  name: Yup.string().required("Nome Obrigratorio"),
-  email: Yup.string()
-    .required("Email requerido ")
-    .email("Digite um Email Válido"),
-  phone: Yup.string().required("Número para contato reuqerido"),
-  cpfCnpj: Yup.string().required("Cpf Requerido"),
-});
-
 const Page = () => {
+  const [id, setId] = useState();
   const [clients, setClients] = useState([]);
-  const { addToast } = useToast();
   const [cep, setCep] = useState("");
   const [show, setShow] = useState(false);
-  const [address, setAddress] = useState({
-    name: "",
-    city: "",
-    state: "",
-    street: "",
-    complement: "",
-    number: "",
-  });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [cpfCnpj, setCpfCnpj] = useState("");
 
-  const handleClose = (data) => setShow(false);
-  const handleShow = (data) => setShow(true);
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [street, setStreet] = useState("");
+  const [complement, setComplment] = useState("");
+  const [number, setNumber] = useState("");
+  const [neighborhood, setNeighborhood] = useState("");
+
+  const [edit, setEdit] = useState(false);
+
+  const handleClose = () => {
+    cleanForm();
+    setShow(false);
+  };
+  const handleShow = () => setShow(true);
 
   function handleCEP(cep) {
-    if (cep.length < 7) {
-      alert("Inserir os 8 digitos do CEP");
-    } else if (cep.length == 8) {
-      console.log("Funcionando" + cep);
-      loadCep(cep);
-    }
+    loadCep(cep);
   }
 
   async function loadClients() {
@@ -85,143 +52,134 @@ const Page = () => {
     loadClients();
   }, []);
 
-  const formik = useFormik({
-    initialValues: initialValues,
+  useEffect(() => {
+    if (cep.length == 8) {
+      loadCep(cep);
+    }
+  }, [cep]);
 
-    validationSchema: schema,
-
-    onSubmit: useCallback(
-      async (data) => {
-        try {
-          await schema.validate(data, {
-            abortEarly: false,
-          });
-
-          var parameter = {
-            name: data.name,
-            email: data.email,
-            phone: data.phone,
-            cpfCnpj: data.cpfCnpj,
-            address: {
-              street: data.street,
-              complement: data.complement,
-              number: data.number,
-              nmCity: data.city,
-              nmState: data.state,
-              neighborhood: data.neighborhood,
-              cep: cep,
-            },
-          };
-          await api
-            .post("/user", parameter)
-            .then((response) => {
-              addToast({
-                type: "success",
-                title: "Usuario cadastrado com Sucesso",
-              });
-              loadClients();
-              formik.resetForm();
-              cleanForm();
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        } catch (error) {
-          if (error instanceof Yup.ValidationError) {
-            const erros = getValidationError(error);
-            erros.forEach((err) => {
-              addToast({
-                type: "error",
-                title: "Erro Autenticação da Pagina",
-                description: err,
-              });
-            });
-            error.erros.map((e) => {
-              addToast({
-                type: "error",
-                title: "Erro Autenticação da Pagina",
-                description: e,
-              });
-            });
-            return;
-          }
-
-          addToast({
-            type: "error",
-            title: "Erro Autenticação da Pagina",
-            description: "Erro inesperado",
-          });
-        }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const data = {
+      name: name,
+      email: email,
+      cpfCnpj: cpfCnpj,
+      phone: phone,
+      address: {
+        cep: cep,
+        nmCity: city,
+        nmState: state,
+        street: street,
+        complement: complement,
+        number: number,
+        neighborhood: neighborhood,
       },
-      [addToast]
-    ),
-
-    onReset: initialValues,
-  });
+    };
+    console.log(data);
+    try {
+      await api.post("/user", data);
+      loadClients();
+      cleanForm();
+    } catch {
+      console.log("erro");
+    }
+  }
 
   async function loadCep(cep) {
     const response = await CepApi.get(`${cep}/json`);
 
     const { logradouro, complemento, bairro, localidade, uf } = response.data;
-    formik.values.complement = complemento;
-    formik.values.street = logradouro;
-    formik.values.neighborhood = bairro;
-    formik.values.city = localidade;
-    formik.values.state = uf;
+    setCity(localidade);
+    setState(uf);
+    setStreet(logradouro);
+    setNeighborhood(bairro);
+    setComplment(complemento);
   }
 
   function cleanForm() {
-    formik.values.name = "";
-    formik.values.cpfCnpj = "";
-    formik.values.neighborhood = "";
-    formik.values.city = "";
-    formik.values.state = "";
-    formik.values.street = "";
-    formik.values.complement = "";
-    formik.values.number = "";
-    formik.values.phone = "";
-    formik.values.email = "";
-    formik.values.neighborhood = "";
+    setName("");
+    setEmail("");
+    setPhone("");
+    setCpfCnpj("");
+    setCity("");
+    setState("");
+    setStreet("");
+    setNeighborhood("");
+    setComplment("");
     setCep("");
+    setNumber("");
   }
 
   function showAddress(client) {
-    setCep(client.cep);
-    setAddress({
-      name: client.name ? client.name : "",
-      city: client.address ? client.address.nmCity : "",
-      state: client.address ? client.address.nmState : "",
-      street: client.address ? client.address.street : "",
-      complement: client.address ? client.address.complement : "",
-      number: client.address ? client.address.number : "",
-    });
-    // formik.values.neighborhood = client.address
-    //   ? client.address.neighborhood
-    //   : "";
-    // formik.values.city = client.address ? client.address.nmCity : "";
-    // formik.values.state = client.address ? client.address.nmState : "";
-    // formik.values.street = client.address ? client.address.street : "";
-    // formik.values.complement = client.address ? client.address.complement : "";
-    // formik.values.number = client.address ? client.address.number : "";
-    // console.log(formik.values.city);
-    handleShow(address);
+    setName(client.name);
+    setCep(client.address.cep ? client.address.cep : "");
+    setStreet(client.address.street ? client.address.street : "");
+    setCity(client.address.nmCity ? client.address.nmCity : "");
+    setState(client.address.nmState ? client.address.nmState : "");
+    setComplment(client.address.complement ? client.address.complement : "");
+    setNumber(client.address.number ? client.address.number : "");
+    setNeighborhood(
+      client.address.neighborhood ? client.address.neighborhood : ""
+    );
+    console.log(client);
+    handleShow();
   }
 
   async function handleDelete(id) {
-    console.log(id);
     await api.delete(`/user/${id}`);
     loadClients();
   }
 
+  const loadUpdate = (client) => {
+    setEdit(true);
+    setId(client.id);
+    setName(client.name ? client.name : "");
+    setEmail(client.email ? client.email : "");
+    setPhone(client.phone ? client.phone : "");
+    setCpfCnpj(client.cpfCnpj ? client.cpfCnpj : "");
+    setCep(client.address.cep ? client.address.cep : "");
+    setStreet(client.address.street ? client.address.street : "");
+    setCity(client.address.nmCity ? client.address.nmCity : "");
+    setState(client.address.nmState ? client.address.nmState : "");
+    setComplment(client.address.complement ? client.address.complement : "");
+    setNumber(client.address.number ? client.address.number : "");
+    setNeighborhood(
+      client.address.neighborhood ? client.address.neighborhood : ""
+    );
+  };
+
+  async function handleUpdate(e) {
+    e.preventDefault();
+    const data = {
+      name: name,
+      email: email,
+      cpfCnpj: cpfCnpj,
+      phone: phone,
+      address: {
+        cep: cep,
+        nmCity: city,
+        nmState: state,
+        street: street,
+        complement: complement,
+        number: number,
+        neighborhood: neighborhood,
+      },
+    };
+    try {
+      await api.put(`user/${id}`, data);
+      loadClients();
+      cleanForm();
+      setEdit(false);
+    } catch {
+      console.log("erro");
+    }
+  }
+
   return (
     <Container style={{ marginTop: 20 }}>
-      <Col md={12}>
-        <Form
-          onReset={formik.handleReset}
-          onSubmit={formik.handleSubmit}
-          noValidate
-        >
-          <h1>Dados Cadastrais </h1>
+      <Col id="topo" md={12}>
+        <Form onSubmit={edit ? handleUpdate : handleSubmit}>
+          <h1>{edit ? "Edição de usuario" : "Dados Cadastrais"} </h1>
           <hr />
           <Form.Group>
             <Row>
@@ -232,10 +190,9 @@ const Page = () => {
                   id="name"
                   name="name"
                   placeholder="Nome completo"
-                  value={formik.values.name}
-                  onChange={formik.handleChange}
-                  error={formik.touched.name && Boolean(formik.errors.name)}
-                  helperText={formik.touched.name && formik.errors.name}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
                 />
               </Col>
             </Row>
@@ -251,24 +208,21 @@ const Page = () => {
                     id="email"
                     name="email"
                     placeholder="Seu melhor e-mail"
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required="email"
                   />
                 </Form.Group>
               </Col>
               <Col>
                 <Form.Label>Telefone:</Form.Label>
                 <Form.Control
-                  type="text"
                   id="phone"
                   name="phone"
                   placeholder="Telefone ou celular"
-                  value={formik.values.phone}
-                  onChange={formik.handleChange}
-                  error={formik.touched.phone && Boolean(formik.errors.phone)}
-                  helperText={formik.touched.phone && formik.errors.phone}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
                 />
               </Col>
             </Row>
@@ -282,12 +236,9 @@ const Page = () => {
                   id="cpfCnpj"
                   name="cpfCnpj"
                   label="Cpf Cnpj"
-                  value={formik.values.cpfCnpj}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.cpfCnpj && Boolean(formik.errors.cpfCnpj)
-                  }
-                  helperText={formik.touched.cpfCnpj && formik.errors.cpfCnpj}
+                  value={cpfCnpj}
+                  onChange={(e) => setCpfCnpj(e.target.value)}
+                  required
                 />
               </Col>
             </Row>
@@ -302,17 +253,19 @@ const Page = () => {
                   label="CEP"
                   value={cep}
                   onChange={(e) => setCep(e.target.value)}
+                  required
                 />
               </Col>
-              <Button onClick={(e) => handleCEP(cep)}>Busca CEP</Button>
+
               <Col>
                 <Form.Label>Rua:</Form.Label>
                 <Form.Control
                   id="street"
                   name="street"
                   label="Rua"
-                  value={formik.values.street}
-                  onChange={formik.handleChange}
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                  required
                 />
               </Col>
             </Row>
@@ -323,8 +276,9 @@ const Page = () => {
                   id="number"
                   name="number"
                   label="number"
-                  value={formik.values.number}
-                  onChange={formik.handleChange}
+                  value={number}
+                  onChange={(e) => setNumber(e.target.value)}
+                  required
                 />
               </Col>
               <Col>
@@ -332,8 +286,9 @@ const Page = () => {
                 <Form.Control
                   id="neighborhood"
                   name="neighborhood"
-                  value={formik.values.neighborhood}
-                  onChange={formik.handleChange}
+                  value={neighborhood}
+                  onChange={(e) => setNeighborhood(e.target.value)}
+                  required
                 />
               </Col>
               <Col>
@@ -341,8 +296,9 @@ const Page = () => {
                 <Form.Control
                   id="city"
                   name="city"
-                  value={formik.values.city}
-                  onChange={formik.handleChange}
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
                 />
               </Col>
               <Col>
@@ -350,8 +306,9 @@ const Page = () => {
                 <Form.Control
                   id="state"
                   name="state"
-                  value={formik.values.state}
-                  onChange={formik.handleChange}
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  required
                 />
               </Col>
               <Col>
@@ -359,15 +316,16 @@ const Page = () => {
                 <Form.Control
                   id="complement"
                   name="complement"
-                  value={formik.values.complement}
-                  onChange={formik.handleChange}
+                  value={complement}
+                  onChange={(e) => setComplment(e.target.value)}
+                  required
                 />
               </Col>
             </Row>
           </Form.Group>
 
           <Button type="submit" variant="success">
-            Cadastrar Cliente
+            {edit ? "Editar cliente" : "Cadastrar Cliente"}
           </Button>
         </Form>
       </Col>
@@ -388,13 +346,6 @@ const Page = () => {
             <th>CPF/CNPJ</th>
             <th>Endereço</th>
             <th>Ação</th>
-            {/* <th>CEP</th>
-            <th>Estado</th>
-            <th>Cidade</th>
-            <th>Bairro</th>
-            <th>Rua</th>
-            <th>Numero</th>
-            <th>Complemento</th> */}
           </tr>
         </thead>
         <tbody>
@@ -408,7 +359,9 @@ const Page = () => {
                 <FaMapMarkerAlt onClick={(e) => showAddress(client)} />
               </td>
               <td>
-                <FaEdit />
+                <a href="#topo">
+                  <FaEdit onClick={(e) => loadUpdate(client)} />
+                </a>
                 <FaTrash onClick={(e) => handleDelete(client.id)} />
               </td>
             </tr>
@@ -418,7 +371,7 @@ const Page = () => {
 
       <Modal size="xl" show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Endereço - {address.name} </Modal.Title>
+          <Modal.Title>Endereço - {name} </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Table
@@ -442,13 +395,13 @@ const Page = () => {
             </thead>
             <tbody>
               <tr>
-                <td>{address.cep ? address.cep : ""}</td>
-                <td>{address.state ? address.state : ""}</td>
-                <td>{address.city ? address.city : ""}</td>
-                <td>{address.neighborhood ? address.neighborhood : ""}</td>
-                <td>{address.street ? address.street : ""}</td>
-                <td>{address.number ? address.number : ""}</td>
-                <td>{address.complement ? address.complement : ""}</td>
+                <td>{cep ? cep : ""}</td>
+                <td>{state ? state : ""}</td>
+                <td>{city ? city : ""}</td>
+                <td>{neighborhood ? neighborhood : ""}</td>
+                <td>{street ? street : ""}</td>
+                <td>{number ? number : ""}</td>
+                <td>{complement ? complement : ""}</td>
               </tr>
             </tbody>
           </Table>
