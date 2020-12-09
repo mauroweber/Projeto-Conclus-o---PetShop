@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { FaSearchLocation } from "react-icons/fa";
+import {
+  FaMapMarkedAlt,
+  FaMapMarkerAlt,
+  FaEdit,
+  FaTrash,
+} from "react-icons/fa";
 import CepApi from "../../helpers/CepApi";
 import InputMask from "react-input-mask";
 // import { Container } from './styled';
@@ -12,6 +17,7 @@ import {
   Card,
   Button,
   Table,
+  Modal,
 } from "react-bootstrap";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -19,7 +25,6 @@ import api from "../../helpers/Api";
 
 import getValidationError from "../../utils/getValidationError";
 import { useToast } from "../../hooks/toast";
-import { complement } from "polished";
 
 const initialValues = {
   name: "",
@@ -48,6 +53,27 @@ const Page = () => {
   const [clients, setClients] = useState([]);
   const { addToast } = useToast();
   const [cep, setCep] = useState("");
+  const [show, setShow] = useState(false);
+  const [address, setAddress] = useState({
+    name: "",
+    city: "",
+    state: "",
+    street: "",
+    complement: "",
+    number: "",
+  });
+
+  const handleClose = (data) => setShow(false);
+  const handleShow = (data) => setShow(true);
+
+  function handleCEP(cep) {
+    if (cep.length < 7) {
+      alert("Inserir os 8 digitos do CEP");
+    } else if (cep.length == 8) {
+      console.log("Funcionando" + cep);
+      loadCep(cep);
+    }
+  }
 
   async function loadClients() {
     const response = await api.get("/user/findAll");
@@ -59,44 +85,31 @@ const Page = () => {
     loadClients();
   }, []);
 
-  async function loadCep(cep) {
-    const response = await CepApi.get(`${cep}/json`);
-    const { logradouro, complemento, bairro, localidade, uf } = response.data;
-    formik.values.complement = complemento;
-    formik.values.street = logradouro;
-    formik.values.neighborhood = bairro;
-    formik.values.city = localidade;
-    formik.values.state = uf;
-  }
-  useEffect(() => {
-    loadCep(cep);
-  }, [cep]);
-
   const formik = useFormik({
     initialValues: initialValues,
 
     validationSchema: schema,
 
     onSubmit: useCallback(
-      async (values) => {
+      async (data) => {
         try {
-          await schema.validate(values, {
+          await schema.validate(data, {
             abortEarly: false,
           });
 
           var parameter = {
-            name: values.name,
-            email: values.email,
-            phone: values.phone,
-            cpfCnpj: values.cpfCnpj,
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            cpfCnpj: data.cpfCnpj,
             address: {
-              street: values.street,
-              complement: values.complement,
-              number: values.number,
-              nmCity: values.city,
-              nmState: values.state,
-              neighborhood: values.neighborhood,
-              cep: values.cep,
+              street: data.street,
+              complement: data.complement,
+              number: data.number,
+              nmCity: data.city,
+              nmState: data.state,
+              neighborhood: data.neighborhood,
+              cep: cep,
             },
           };
           await api
@@ -106,9 +119,11 @@ const Page = () => {
                 type: "success",
                 title: "Usuario cadastrado com Sucesso",
               });
+              loadClients();
+              formik.resetForm();
+              cleanForm();
             })
             .catch((error) => {
-              debugger;
               console.log(error);
             });
         } catch (error) {
@@ -144,10 +159,64 @@ const Page = () => {
     onReset: initialValues,
   });
 
+  async function loadCep(cep) {
+    const response = await CepApi.get(`${cep}/json`);
+
+    const { logradouro, complemento, bairro, localidade, uf } = response.data;
+    formik.values.complement = complemento;
+    formik.values.street = logradouro;
+    formik.values.neighborhood = bairro;
+    formik.values.city = localidade;
+    formik.values.state = uf;
+  }
+
+  function cleanForm() {
+    formik.values.name = "";
+    formik.values.cpfCnpj = "";
+    formik.values.neighborhood = "";
+    formik.values.city = "";
+    formik.values.state = "";
+    formik.values.street = "";
+    formik.values.complement = "";
+    formik.values.number = "";
+    formik.values.phone = "";
+    formik.values.email = "";
+    formik.values.neighborhood = "";
+    setCep("");
+  }
+
+  function showAddress(client) {
+    setCep(client.cep);
+    setAddress({
+      name: client.name ? client.name : "",
+      city: client.address ? client.address.nmCity : "",
+      state: client.address ? client.address.nmState : "",
+      street: client.address ? client.address.street : "",
+      complement: client.address ? client.address.complement : "",
+      number: client.address ? client.address.number : "",
+    });
+    // formik.values.neighborhood = client.address
+    //   ? client.address.neighborhood
+    //   : "";
+    // formik.values.city = client.address ? client.address.nmCity : "";
+    // formik.values.state = client.address ? client.address.nmState : "";
+    // formik.values.street = client.address ? client.address.street : "";
+    // formik.values.complement = client.address ? client.address.complement : "";
+    // formik.values.number = client.address ? client.address.number : "";
+    // console.log(formik.values.city);
+    handleShow(address);
+  }
+
+  async function handleDelete(id) {
+    console.log(id);
+    await api.delete(`/user/${id}`);
+    loadClients();
+  }
+
   return (
     <Container style={{ marginTop: 20 }}>
       <Col md={12}>
-        <form
+        <Form
           onReset={formik.handleReset}
           onSubmit={formik.handleSubmit}
           noValidate
@@ -235,7 +304,7 @@ const Page = () => {
                   onChange={(e) => setCep(e.target.value)}
                 />
               </Col>
-
+              <Button onClick={(e) => handleCEP(cep)}>Busca CEP</Button>
               <Col>
                 <Form.Label>Rua:</Form.Label>
                 <Form.Control
@@ -290,8 +359,6 @@ const Page = () => {
                 <Form.Control
                   id="complement"
                   name="complement"
-                  label="Complemento"
-                  placeholder="Complemento"
                   value={formik.values.complement}
                   onChange={formik.handleChange}
                 />
@@ -299,38 +366,94 @@ const Page = () => {
             </Row>
           </Form.Group>
 
-          <Button variant="success" type="submit">
+          <Button type="submit" variant="success">
             Cadastrar Cliente
           </Button>
-        </form>
+        </Form>
       </Col>
 
-      <Table className="mt-5" responsive striped bordered hover>
+      <Table
+        style={{ textAlign: "center" }}
+        className="mt-5"
+        responsive
+        striped
+        bordered
+        hover
+      >
         <thead>
           <tr>
             <th>Nome</th>
             <th>E-mail</th>
             <th>Telefone</th>
             <th>CPF/CNPJ</th>
-            <th>CEP</th>
+            <th>Endereço</th>
+            <th>Ação</th>
+            {/* <th>CEP</th>
+            <th>Estado</th>
+            <th>Cidade</th>
             <th>Bairro</th>
             <th>Rua</th>
             <th>Numero</th>
+            <th>Complemento</th> */}
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>(73) 3214-600</td>
-            <td>45600000</td>
-            <td>Bairro jaçanã</td>
-            <td>Rua de palha</td>
-            <td>50</td>
-          </tr>
+          {clients.map((client) => (
+            <tr key={client.id}>
+              <td>{client.name}</td>
+              <td>{client.email}</td>
+              <td>{client.phone}</td>
+              <td>{client.cpfCnpj}</td>
+              <td>
+                <FaMapMarkerAlt onClick={(e) => showAddress(client)} />
+              </td>
+              <td>
+                <FaEdit />
+                <FaTrash onClick={(e) => handleDelete(client.id)} />
+              </td>
+            </tr>
+          ))}
         </tbody>
       </Table>
+
+      <Modal size="xl" show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Endereço - {address.name} </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Table
+            style={{ textAlign: "center" }}
+            className="mt-2"
+            responsive
+            striped
+            bordered
+            hover
+          >
+            <thead>
+              <tr>
+                <th>CEP</th>
+                <th>Estado</th>
+                <th>Cidade</th>
+                <th>Bairro</th>
+                <th>Rua</th>
+                <th>Numero</th>
+                <th>Complemento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{address.cep ? address.cep : ""}</td>
+                <td>{address.state ? address.state : ""}</td>
+                <td>{address.city ? address.city : ""}</td>
+                <td>{address.neighborhood ? address.neighborhood : ""}</td>
+                <td>{address.street ? address.street : ""}</td>
+                <td>{address.number ? address.number : ""}</td>
+                <td>{address.complement ? address.complement : ""}</td>
+              </tr>
+            </tbody>
+          </Table>
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 };
