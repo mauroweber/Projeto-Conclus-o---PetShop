@@ -12,26 +12,6 @@ import api from '../../helpers/Api';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { AppsTwoTone } from '@material-ui/icons';
 
-const cores = [
-  { id: 1, cor: 'Preto' },
-  { id: 2, cor: 'Branco' },
-  { id: 3, cor: 'Marron' },
-  { id: 4, cor: 'Beje' },
-  { id: 5, cor: 'Pintado' },
-  { id: 6, cor: 'Mestiço' },
-];
-
-// const pet = [
-//   { id: 1, tipo: 'Cachorro' },
-//   { id: 2, tipo: 'Gato' },
-// ];
-
-// const port = [
-//   { id: 1, porte: 'Grande' },
-//   { id: 2, porte: 'Medio' },
-//   { id: 3, porte: 'Pequeno' },
-// ];
-
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -54,9 +34,9 @@ const initialValues = {
 };
 
 const schema = yup.object().shape({
-  name: yup.string().required('Insira o nome do Pet'),
-  doctorName: yup.string().required("Digite"),
-  sex: yup.string().oneOf(["Masculino", "Feminino"]).required('Sexo do Animal Obrigatorio'),
+  name: yup.string().required('Preencho o nome'),
+  // doctorName: yup.string().required("Digite"),
+  // sex: yup.string().oneOf(["Masculino", "Feminino"]).required('Sexo do Animal Obrigatorio'),
   // birthday: yup.date().required('Coloque a date de Nascimento'),
 });
 
@@ -81,11 +61,11 @@ const Pets = () => {
           abortEarly: false
         })
         formik.setStatus();
-        if (edit) {
-          await updatePet(values);
-        } else {
-          await createPet(values);
-        }
+        // if (edit) {
+        //   await update(values);
+        // } else {
+        //   await create(values);
+        // }
 
       } catch (e) {
         Swal.fire({
@@ -119,7 +99,7 @@ const Pets = () => {
     });
   }
 
-  const createPet = async (data) => {
+  const create = async (data) => {
     let parameter = {
       name: data.name,
       doctorName: data.doctorName,
@@ -157,7 +137,7 @@ const Pets = () => {
       });
   }
 
-  const updatePet = async (data) => {
+  const update = async (data) => {
     const parameter = pet;
     parameter.name = data.name;
     parameter.doctorName = data.doctorName;
@@ -248,7 +228,7 @@ const Pets = () => {
         backdrop='static'
         keyboard={false}>
         <Modal.Header closeButton onHide={closeModal} >
-          <Modal.Title>{(edit && 'Atualizar Pet') || 'Cadastro do Pet'}</Modal.Title>
+          <Modal.Title>{(edit && 'Atualizar PACOTE') || 'Novo Pacote'}</Modal.Title>
         </Modal.Header>
         <Modal.Body >
           <Form onReset={formik.resetForm} onSubmit={formik.handleSubmit} noValidate>
@@ -269,7 +249,7 @@ const Pets = () => {
                 />
               </Form.Group>
             </Form.Row>
-            <Form.Row>
+            {/* <Form.Row>
               <Form.Group as={Col} controlId='doctorName'>
                 <TextField
                   fullWidth
@@ -357,10 +337,10 @@ const Pets = () => {
                   }}
                   
                 />
-                </Form.Group> */}
+                </Form.Group> 
             </Form.Row>
             <Form.Row>
-              <Form.Group as={Col} controlId='color'>
+               <Form.Group as={Col} controlId='color'>
                 <TextField
                   fullWidth
                   select
@@ -382,9 +362,9 @@ const Pets = () => {
                   ))
                   }
                 </TextField>
-              </Form.Group>
+              </Form.Group> 
 
-              <Form.Group as={Col} controlId='formGridEmail'>
+             <Form.Group as={Col} controlId='formGridEmail'>
                 <TextField
                   id='raca'
                   name='raca'
@@ -414,7 +394,7 @@ const Pets = () => {
                   helperText={formik.touched.raca && formik.errors.raca}
                 />
               </Form.Group>
-            </Form.Row>
+            </Form.Row>  */}
             <Button type='submit' disabled={formik.isSubmitting}>
               {formik.isSubmitting && <span className="spinner-border spinner-border-sm mr-1"></span>}
               {(edit && 'Editar Pet') || 'Cadastrar'}
@@ -423,23 +403,19 @@ const Pets = () => {
 
         </Modal.Body>
       </Modal>
-      <Typography variant='h4' style={style}>Pets Cadastrados</Typography>
+      <Typography variant='h4' style={style}>Controle de Pacotes</Typography>
       <hr />
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell align='right'>Nome Pet</TableCell>
-            <TableCell align='right'>Nome Veterinario</TableCell>
-            <TableCell align='right'>Sexo</TableCell>
-            <TableCell align='right'>Aniversario</TableCell>
-            <TableCell align='right'>Cor</TableCell>
-            <TableCell align='right'>Raça</TableCell>
-            <TableCell align='right'>Recomendações</TableCell>
+            <TableCell align='right'>Nome</TableCell>
+
             <TableCell />
           </TableRow>
         </TableHead>
         <TableBody>
-          {pets.map(pet => (
+          <TableCell align='right' ></TableCell>
+          {/* {pets.map(pet => (
             <TableRow key={pet.id}>
               <TableCell style={{textAlign: "left"}} align='right'>{pet.name}</TableCell>
               <TableCell align='right'>{pet.doctorName}</TableCell>
@@ -458,7 +434,7 @@ const Pets = () => {
               </TableCell>
 
             </TableRow>
-          ))}
+          ))} */}
         </TableBody>
       </Table>
     </Container >

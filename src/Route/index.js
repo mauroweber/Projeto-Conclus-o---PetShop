@@ -14,6 +14,7 @@ import ListPetshop from "../pages/ListPetshop";
 import Dashboard from "../pages/DashboardView";
 import Pets from "../pages/Pet";
 import Supplier from "../pages/Supplier";
+import Pacotes from "../pages/Pacotes";
 
 export default () => {
   return (
@@ -29,6 +30,7 @@ export default () => {
       <Route exact path="/dashboard" component={Dashboard} />
       <Route exact path="/pets" component={Pets} isPrivate />
       <Route exact path="/supplier" component={Supplier} isPrivate />
+      <Route exact path="/pacotes" component={Pacotes} isPrivate />
       <Route>
         <NotFound />
       </Route>

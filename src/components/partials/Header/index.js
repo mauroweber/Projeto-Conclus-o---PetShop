@@ -12,6 +12,7 @@ import {
   FaPaw,
   FaTruck,
   FaSignOutAlt,
+  FaCalendarCheck
 } from "react-icons/fa";
 import "./style.css";
 
@@ -52,6 +53,10 @@ const Header = () => {
             <Nav.Link id="menu-link" href="/supplier">
               <FaTruck style={{ marginRight: 5 }} />
               Fornecedor
+            </Nav.Link>
+            <Nav.Link id="menu-link" href="/pacotes">
+              <FaCalendarCheck style={{ marginRight: 5 }} />
+              Controle de Pacotes
             </Nav.Link>
             <Nav.Link id="menu-link" onClick={handleLogout}>
               <FaSignOutAlt style={{ marginRight: 5 }} />

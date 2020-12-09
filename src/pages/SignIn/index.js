@@ -48,7 +48,6 @@ const SignIn = () => {
 
   const submitHandler = useCallback(
     async (data) => {
-      console.log(data);
       try {
         formRef.current.setErrors({});
         const schema = Yup.object().shape({
@@ -66,15 +65,25 @@ const SignIn = () => {
           email: data.email,
           key_password: data.key_password,
         }).then((response) => {
-          Swal.fire({
-            position: "center",
-            icon: "success",
-            title: "Usuario Autenticado",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-          // setTimeout(() => {
-          // }, 1500);
+            if(response){
+              Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Usuario Autenticado",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+              setTimeout(() => {
+              }, 1500);
+            }else{
+              Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Senha ou Email Ivalido",
+                showConfirmButton: false,
+                timer: 2000,
+              });
+            }
         });
       } catch (erro) {
         if (erro instanceof Yup.ValidationError) {
